@@ -6,10 +6,12 @@
 #include <iostream>
 #include <cwctype>
 #include <algorithm>
+#include "I2CDisplay.h"
 
 using namespace Platform;
 using namespace Windows::Foundation;
 using namespace Windows::Devices::I2c;
+using namespace DefaultApp::Data;
 using namespace std;
 
 class wexception
@@ -183,6 +185,11 @@ void write(vector<BYTE>& writeBuf, I2cDevice^ device)
 	}
 }
 
+void write(BYTE data, I2cDevice^ device) {
+	vector<BYTE> v = { data };
+	write(v, device);
+}
+
 I2cDevice^ create(int address, String^ friendlyName)
 {
 	// Create the sensor device object
@@ -198,7 +205,6 @@ I2cDevice^ create(int address, String^ friendlyName)
 	return device;
 }
 
-
 double readTempreture()
 {
 	String^ friendlyName;
@@ -211,31 +217,12 @@ double readTempreture()
 	return tmp * 0.0625;
 }
 
-BYTE _addr;
-BYTE _displayfunction;
-BYTE _displaycontrol;
-BYTE _displaymode;
-BYTE _cols;
-BYTE _rows;
-BYTE _charsize;
-BYTE _backlightval;
 I2cDevice^ lcd;
-
-void expanderWrite(BYTE _data) {
-	int temp = _data | _backlightval;
-	vector<BYTE> bytes;
-	BYTE mask = 0xFF;
-	do {
-		bytes.push_back(temp & mask);
-		temp >>= 8;
-	} while (temp);
-	reverse(bytes.begin(), bytes.end());
-	write(bytes, lcd);
-}
 
 static LARGE_INTEGER HpcFreq;
 static double HpcMicroNumTicks;
 static double HpcPerdiodNs;
+static I2CDisplay ^d;
 
 void delay(unsigned us) {
 	Sleep(us);
@@ -259,184 +246,23 @@ void delayMicroseconds(unsigned us)
 	}
 }
 
-void pulseEnable(BYTE _data) {
-	expanderWrite(_data | En);	// En high
-	delayMicroseconds(1);		// enable pulse must be >450ns
-
-	expanderWrite(_data & ~En);	// En low
-	delayMicroseconds(50);		// commands need > 37us to settle
-}
-
-void write4bits(BYTE value) {
-	expanderWrite(value);
-	pulseEnable(value);
-}
-
-void send(BYTE value, BYTE mode) {
-	BYTE highnib = value & 0xf0;
-	BYTE lownib = (value << 4) & 0xf0;
-	write4bits((highnib) | mode);
-	write4bits((lownib) | mode);
-}
-
-inline void command(BYTE value) {
-	send(value, 0);
-}
-
-inline void write(BYTE value) {
-	send(value, Rs);
-}
-
-void display() {
-	_displaycontrol |= LCD_DISPLAYON;
-	command(LCD_DISPLAYCONTROL | _displaycontrol);
-}
-
-void clear() {
-	command(LCD_CLEARDISPLAY);// clear display, set cursor position to zero
-	delayMicroseconds(2000);  // this command takes a long time!
-}
-
-void home() {
-	command(LCD_RETURNHOME);  // set cursor position to zero
-	delayMicroseconds(2000);  // this command takes a long time!
-}
-
-void init() {
-	_backlightval = LCD_BACKLIGHT;
-	_addr = (BYTE)lcd->ConnectionSettings->SlaveAddress;
-	_displaycontrol = 0;
-	_displaymode = 0;
-	_cols = 16;
-	_rows = 2;
-	_charsize = 0;
-	_displayfunction = LCD_4BITMODE | LCD_1LINE | LCD_5x8DOTS;
-
-	if (_rows > 1) {
-		_displayfunction |= LCD_2LINE;
-	}
-
-	// for some 1 line displays you can select a 10 pixel high font
-	if ((_charsize != 0) && (_rows == 1)) {
-		_displayfunction |= LCD_5x10DOTS;
-	}
-
-	// SEE PAGE 45/46 FOR INITIALIZATION SPECIFICATION!
-	// according to datasheet, we need at least 40ms after power rises above 2.7V
-	// before sending commands. Arduino can turn on way befer 4.5V so we'll wait 50
-	delay(50);
-
-	// Now we pull both RS and R/W low to begin commands
-	expanderWrite(_backlightval);	// reset expanderand turn backlight off (Bit 8 =1)
-	delay(1000);
-
-	//put the LCD into 4 bit mode
-	// this is according to the hitachi HD44780 datasheet
-	// figure 24, pg 46
-
-	// we start in 8bit mode, try to set 4 bit mode
-	write4bits(0x03 << 4);
-	delayMicroseconds(4500); // wait min 4.1ms
-
-							 // second try
-	write4bits(0x03 << 4);
-	delayMicroseconds(4500); // wait min 4.1ms
-
-							 // third go!
-	write4bits(0x03 << 4);
-	delayMicroseconds(150);
-
-	// finally, set to 4-bit interface
-	write4bits(0x02 << 4);
-
-	// set # lines, font size, etc.
-	command(LCD_FUNCTIONSET | _displayfunction);
-
-	// turn the display on with no cursor or blinking default
-	_displaycontrol = LCD_DISPLAYON | LCD_CURSOROFF | LCD_BLINKOFF;
-	display();
-
-	// clear it off
-	clear();
-
-	// Initialize to default text direction (for roman languages)
-	_displaymode = LCD_ENTRYLEFT | LCD_ENTRYSHIFTDECREMENT;
-
-	// set the entry mode
-	command(LCD_ENTRYMODESET | _displaymode);
-
-	home();
-}
-
-void setCursor(BYTE col, BYTE row) {
-	BYTE row_offsets[] = { 0x00, 0x40, 0x14, 0x54 };
-	if (row > _rows) {
-		row = _rows - 1;    // we count rows starting w/0
-	}
-	command(LCD_SETDDRAMADDR | (col + row_offsets[row]));
-}
-
-void backlight() {
-	_backlightval = LCD_BACKLIGHT;
-	expanderWrite(0);
-}
-
-void noBacklight() {
-	_backlightval = LCD_NOBACKLIGHT;
-	expanderWrite(0);
-}
-
-BYTE newChar[8] = {
-	0B00000,
-	0B01110,
-	0B10001,
-	0B10001,
-	0B10001,
-	0B01010,
-	0B11011,
-	0B00000
-};
-
-void createChar(BYTE location, BYTE charmap[]) {
-	location &= 0x7; // we only have 8 locations 0-7
-	command(LCD_SETCGRAMADDR | (location << 3));
-	for (int i = 0; i < 8; i++) {
-		write(charmap[i]);
-	}
-}
-
-void display(wstring data)
+void show(wstring data)
 {
-	//wcout << L"Temperature is " << data << L" Hello" << L"\n";
-	String^ friendlyName;
-	lcd = create(0x27, friendlyName);
-	init();
-	createChar(0, newChar);
-	for (int i = 0; i < 3; i++)
-	{
-		backlight();
-		delay(250);
-		noBacklight();
-		delay(250);
-	}
-	setCursor(0, 0);
-	backlight();
-	write(100);
-	write(101);
-	write(102);
-	write(103);
+	d = ref new I2CDisplay();
+	Platform::String ^dataString = ref new Platform::String(data.c_str());
+	d->Line0 = dataString;
 }
 
 int main(Array<String^>^ args)
 {
 	(void)QueryPerformanceFrequency(&HpcFreq);
-
 	HpcPerdiodNs = 1000000000.0 / HpcFreq.QuadPart;
 	HpcMicroNumTicks = (double)HpcFreq.QuadPart / 1000000.0;
 
     try {
 		double celsius = readTempreture();
-		display(to_wstring((int)celsius));
+		wcout << L"Temperature is " << celsius << L"\n";
+		show(to_wstring((int)celsius));
     } catch (const wexception& ex) {
         wcerr << L"Error: " << ex.wwhat() << L"\n";
         return 1;

@@ -1,5 +1,11 @@
 #pragma once
 
+// Define COMMAND and DATA LCD Rs (used by send method).
+// ---------------------------------------------------------------------------
+#define COMMAND                 0
+#define DATA                    1
+#define FOUR_BITS               2
+
 // commands
 #define LCD_CLEARDISPLAY 0x01
 #define LCD_RETURNHOME 0x02
@@ -45,3 +51,62 @@
 #define En 0B00000100  // Enable bit
 #define Rw 0B00000010  // Read/Write bit
 #define Rs 0B00000001  // Register select bit
+
+// Default library configuration parameters used by class constructor with
+// only the I2C address field.
+// ---------------------------------------------------------------------------
+/*!
+@defined
+@abstract   Enable bit of the LCD
+@discussion Defines the IO of the expander connected to the LCD Enable
+*/
+#define EN 6  // Enable bit
+
+/*!
+@defined
+@abstract   Read/Write bit of the LCD
+@discussion Defines the IO of the expander connected to the LCD Rw pin
+*/
+#define RW 5  // Read/Write bit
+
+/*!
+@defined
+@abstract   Register bit of the LCD
+@discussion Defines the IO of the expander connected to the LCD Register select pin
+*/
+#define RS 4  // Register select bit
+
+/*!
+@defined
+@abstract   LCD dataline allocation this library only supports 4 bit LCD control
+mode.
+@discussion D4, D5, D6, D7 LCD data lines pin mapping of the extender module
+*/
+#define D4 0
+#define D5 1
+#define D6 2
+#define D7 3
+
+/*!
+@defined
+@abstract   Defines the duration of the home and clear commands
+@discussion This constant defines the time it takes for the home and clear
+commands in the LCD - Time in microseconds.
+*/
+#define HOME_CLEAR_EXEC      2000
+
+/*!
+@defined
+@abstract   Backlight off constant declaration
+@discussion Used in combination with the setBacklight to swith off the
+LCD backlight. @set setBacklight
+*/
+#define BACKLIGHT_OFF           0
+
+/*!
+@defined
+@abstract   Backlight on constant declaration
+@discussion Used in combination with the setBacklight to swith on the
+LCD backlight. @set setBacklight
+*/
+#define BACKLIGHT_ON          255
