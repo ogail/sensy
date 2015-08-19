@@ -21,6 +21,7 @@ Revision History:
 --*/
 
 #include "internal.h"
+#include <assert.h>
 
 DWORD WINAPI InterruptNotificationThread(
     _In_ LPVOID pvData
@@ -53,6 +54,69 @@ WINAPI
 OnControlKey(
     _In_ DWORD ControlType
     );
+
+VOID ExecuteCommand(string name, list<string> *params)
+{
+	CCommand* command = NULL;
+	string tag;
+
+	if (_stricmp(name.c_str(), "open") == 0)
+	{
+		command = new COpenCommand(params, tag);
+	}
+	else if (_stricmp(name.c_str(), "read") == 0)
+	{
+		command = new CReadCommand(params, tag);
+	}
+	else if (_stricmp(name.c_str(), "write") == 0)
+	{
+		command = new CWriteCommand(params, tag);
+	}
+	else if (_stricmp(name.c_str(), "close") == 0)
+	{
+		command = new CCloseCommand(params, tag);
+	}
+	else
+	{
+		assert(!"The sent cmd is not expected!");
+	}
+
+	if (command->Parse())
+	{
+		g_CurrentCommand = command;
+		RunCommand(command);
+		g_CurrentCommand = nullptr;
+
+		if (_stricmp(name.c_str(), "read") == 0)
+		{
+			BYTE MSB = ((CReadCommand*)command)->Buffer[0];
+			BYTE LSB = ((CReadCommand*)command)->Buffer[1];
+			int tmp = (((MSB << 8) | LSB) >> 4) * 0.0625;
+			printf("tmp is:%d\n", tmp);
+		}
+	}
+	else
+	{
+		command->DetachParameter(); //avoid double deletion
+	}
+
+	delete command;
+}
+
+VOID
+Sense()
+{
+	list<string> *params;
+
+	params = new list<string>{ "0x48" };
+	ExecuteCommand("open", params);
+
+	params = new list<string>{ "2" };
+	ExecuteCommand("read", params);
+
+	params = new list<string>{ "0x48" };
+	ExecuteCommand("close", params);
+}
 
 void 
 __cdecl 
@@ -246,30 +310,35 @@ main(
         {
             delete tokens;
             continue;
-        }
+		}
+		else if (_stricmp(tokens->front().c_str(), "magic") == 0)
+		{
+			Sense();
+		}
+		else
+		{
+			command = CCommand::_ParseCommand(tokens);
 
-        command = CCommand::_ParseCommand(tokens);
+			if (command == nullptr)
+			{
+				delete tokens;
+				continue;
+			}
 
-        if (command == nullptr) 
-        {
-            delete tokens;
-            continue;
-        }
+			g_CurrentCommand = command;
 
-        g_CurrentCommand = command;
-            
-        RunCommand(command);
+			RunCommand(command);
 
-        g_CurrentCommand = nullptr;
-            
-        //
-        // A reference to the tokens list is saved by
-        // the command and will be freed when the command
-        // is deleted.
-        //
-        
-        delete command;
+			g_CurrentCommand = nullptr;
 
+			//
+			// A reference to the tokens list is saved by
+			// the command and will be freed when the command
+			// is deleted.
+			//
+
+			delete command;
+		}
     }
     while (feof(inputStream) == 0);
 
