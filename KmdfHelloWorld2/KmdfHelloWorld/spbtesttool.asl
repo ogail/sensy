@@ -5,7 +5,7 @@
 // 5. Copy the compiled file under Windows/System32 folder
 // 6. Restart your development board
 
-DefinitionBlock ("ACPITABL.dat", "SSDT", 1, "MSFT", "SPBT", 1)
+DefinitionBlock ("ACPITABL.dat", "SSDT", 0x1, "Ogail", "SPBT", 0x1)
 {
     Scope (\_SB)
     {
@@ -17,14 +17,7 @@ DefinitionBlock ("ACPITABL.dat", "SSDT", 1, "MSFT", "SPBT", 1)
 			{
 				Name (RBUF, ResourceTemplate ()
 				{
-					//
-					// Sample I2C resources. Modify to match your
-					// platform's underlying controllers and connections.
-					// \_SB.I2C is path to predefined I2C 
-					// and GPIO controller instance. 
-					//
-					I2CSerialBus(0x48, ControllerInitiated, 400000, AddressingMode7Bit, "\\_SB.I2C", , )
-					//I2CSerialBus(0x27, ControllerInitiated, 400000, AddressingMode7Bit, "\\_SB.I2C", , )
+					I2CSerialBus(0x48, ControllerInitiated, 400000, AddressingMode7Bit, "\\_SB.I2C1", , )
 				})
 				Return(RBUF)
 			}
