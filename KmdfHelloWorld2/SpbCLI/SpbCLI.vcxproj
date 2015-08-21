@@ -91,12 +91,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="command.cpp" />
+    <ClCompile Include="I2CDisplay.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="util.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\KmdfHelloWorld\spbtestioctl.h" />
     <ClInclude Include="command.h" />
+    <ClInclude Include="I2CDisplay.h" />
     <ClInclude Include="internal.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
