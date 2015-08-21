@@ -19,6 +19,8 @@ Revision History:
 
 --*/
 
+#pragma once
+
 typedef struct CCommand CCommand, *PCCommand;
 
 pair<ULONG, PBYTE>
@@ -415,7 +417,7 @@ public:
 
         Length = buf.first;
         Buffer = buf.second;
-        
+
         return true;
     }
 

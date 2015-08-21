@@ -21,6 +21,7 @@ Revision History:
 --*/
 
 #include "internal.h"
+#include "I2CDisplay.h"
 #include <assert.h>
 
 DWORD WINAPI InterruptNotificationThread(
@@ -115,6 +116,15 @@ Sense()
 	ExecuteCommand("read", params);
 
 	params = new list<string>{ "0x48" };
+	ExecuteCommand("close", params);
+
+	params = new list<string>{ "0x27" };
+	ExecuteCommand("open", params);
+	
+	I2CDisplay screen;
+	screen.SetLine0("Hello world!");
+
+	params = new list<string>{ "0x27" };
 	ExecuteCommand("close", params);
 }
 

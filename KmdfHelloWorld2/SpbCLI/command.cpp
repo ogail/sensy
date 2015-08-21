@@ -19,6 +19,8 @@ Revision History:
 
 --*/
 
+#pragma once
+
 #include "internal.h"
 
 long CCommand::s_Index = 1;

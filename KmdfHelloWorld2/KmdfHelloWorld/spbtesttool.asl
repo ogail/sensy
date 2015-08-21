@@ -18,6 +18,7 @@ DefinitionBlock ("ACPITABL.dat", "SSDT", 0x1, "Ogail", "SPBT", 0x1)
 				Name (RBUF, ResourceTemplate ()
 				{
 					I2CSerialBus(0x48, ControllerInitiated, 400000, AddressingMode7Bit, "\\_SB.I2C1", , )
+					I2CSerialBus(0x27, ControllerInitiated, 400000, AddressingMode7Bit, "\\_SB.I2C1", , )
 				})
 				Return(RBUF)
 			}

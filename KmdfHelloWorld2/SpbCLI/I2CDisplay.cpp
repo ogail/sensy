@@ -3,67 +3,92 @@
 #include <iostream>
 #include <cwctype>
 #include <ppltasks.h>
+#include <assert.h>
+#include <sstream>
 #include "I2CDisplay.h"
 
-using namespace Windows::Foundation;
-using namespace Platform;
-using namespace Windows::Devices::Enumeration;
-using namespace Windows::Devices::I2c;
-using namespace DefaultApp::Data;
-using namespace Concurrency;
 using namespace std;
 
 I2CDisplay::I2CDisplay()
 {
-    displayDevice = nullptr;
     for(unsigned int n = 0; n < 4; n++)
     {
-        LineBuf[0] = ref new String(L"");
+        LineBuf[0] = "";
     }
     lcdInterfaceData = lcdBacklight;
-
-	String^ aqs;
-	aqs = I2cDevice::GetDeviceSelector();
-
-	auto dis = concurrency::create_task(DeviceInformation::FindAllAsync(aqs)).get();
-	if (dis->Size != 1) {
-		//throw wexception(L"I2C bus not found");
-	}
-
-	String^ id = dis->GetAt(0)->Id;
-	auto device = concurrency::create_task(I2cDevice::FromIdAsync(
-		id,
-		ref new I2cConnectionSettings(deviceAddress))).get();
-
-	if (!device) {
-		//wostringstream msg;
-		//msg << L"Slave address 0x" << hex << deviceAddress << L" on bus " << id->Data() <<
-		//	L" is in use. Please ensure that no other applications are using I2C.";
-		//throw wexception(msg.str());
-	}
-
-	displayDevice = device;
+	gEvent = CreateEvent(nullptr, true, false, nullptr);
 }
 
 I2CDisplay::~I2CDisplay()
 {
     ClearScreen();
     Backlight(FALSE);
+	if (gEvent != nullptr)
+	{
+		CloseHandle(gEvent);
+	}
+}
+
+DWORD I2CDisplay::RunCommand(_In_ PCCommand Command)
+{
+	DWORD status;
+	DWORD bytesTransferred;
+	
+	Command->Overlapped.hEvent = gEvent;
+
+	if (Command->Execute() == true)
+	{
+		if (GetOverlappedResult(Command->File,
+			&(Command->Overlapped),
+			&bytesTransferred,
+			true) == FALSE)
+		{
+			status = GetLastError();
+		}
+		else
+		{
+			status = NO_ERROR;
+		}
+
+		Command->Complete(status, bytesTransferred);
+	}
+	else
+	{
+		status = GetLastError();
+	}
+
+	return status;
+}
+
+VOID I2CDisplay::ExecuteCommand(string name, list<string> *params)
+{
+	assert(!_stricmp(name.c_str(), "write"));
+	string tag;
+	CWriteCommand command(params, tag);
+
+	if (command.Parse())
+	{
+		RunCommand(&command);
+	}
+	else
+	{
+		command.DetachParameter(); //avoid double deletion
+	}
 }
 
 void I2CDisplay::I2CWriteIOPort()
 {
-    if(displayDevice != nullptr)
-    {
-        Array<byte>^ dataBuffer = ref new Array<byte>(1);
-        dataBuffer[0] = lcdInterfaceData;
-        displayDevice->Write(dataBuffer);
-    }
+	std::stringstream stream; // lcdInterfaceData
+	stream << std::hex;
+	stream << std::setw(2) << std::setfill('0') << (int)lcdInterfaceData;
+	string tmp(stream.str());
+	list<string> * dataBuffer = new list<string>{ "{", tmp, "}" };
+	ExecuteCommand("write", dataBuffer);
 }
 
 void I2CDisplay::WriteNibble(
-    boolean registerSelect,
-    UINT8 dataNibble)
+    bool registerSelect,
+    BYTE dataNibble)
 {
     // Set the data...
     lcdInterfaceData &= lcdBacklight; // Zero everything but the backlight state
@@ -81,8 +106,7 @@ void I2CDisplay::WriteNibble(
 //    Sleep(1); // wait for 37us
 }
 
-void I2CDisplay::Backlight(
-    boolean backlightOn)
+void I2CDisplay::Backlight(bool backlightOn)
 {
     if(backlightOn)
     {
@@ -96,10 +120,10 @@ void I2CDisplay::Backlight(
 }
 
 void I2CDisplay::WriteByte(
-    boolean registerSelect,
-    UINT8 dataByte)
+    bool registerSelect,
+    BYTE dataByte)
 {
-    UINT8 nibble = ((dataByte & 0xF0) >> 4);
+    BYTE nibble = ((dataByte & 0xF0) >> 4);
     WriteNibble(registerSelect, nibble);
     nibble = (dataByte & 0x0F);
     WriteNibble(registerSelect, nibble);
@@ -108,7 +132,7 @@ void I2CDisplay::WriteByte(
 void I2CDisplay::LineSelect(
     unsigned int line)
 {
-    UINT8 controlByte = lcdSetDDRAMAddress;
+    BYTE controlByte = lcdSetDDRAMAddress;
     switch(line)
     {
     case 0:
@@ -150,29 +174,23 @@ void I2CDisplay::Initialize()
     WriteByte(FALSE, lcdCursorShift | lcdCursorShiftCursorMove | lcdCursorShiftMoveRight);
 }
 
-void I2CDisplay::Write(String ^str)
+void I2CDisplay::Write(string str)
 {
-    unsigned int strLen = min(str->Length(), 20);
+    unsigned int strLen = min(str.size(), 20);
     for(unsigned int n = 0; n < strLen; n++)
     {
         // Write the string
-        WriteByte(TRUE, (UINT8)str->Data()[n]);
+        WriteByte(TRUE, (BYTE)str[n]);
     }
     for(unsigned int n = strLen; n < 20; n++)
     {
         // delete the rest of the line
-        WriteByte(TRUE, (UINT8)' ');
+        WriteByte(TRUE, (BYTE)' ');
     }
 }
 
 void I2CDisplay::Update(unsigned int line)
 {
-    // Do we have a functional display?
-    if(displayDevice == nullptr)
-    {
-        return;
-    }
-
     // Initialize display on first use
     if(!IsInitialized)
     {
