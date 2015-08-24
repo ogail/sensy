@@ -58,10 +58,11 @@ OnPrepareHardware(
 
 --*/
 {
-    FuncEntry(TRACE_FLAG_WDFLOADING);
+    //FuncEntry(TRACE_FLAG_WDFLOADING);
 
     PDEVICE_CONTEXT pDevice = GetDeviceContext(FxDevice);
-    BOOLEAN fSpbResourceFound = FALSE;
+	BOOLEAN fTmpResourceFound = FALSE;
+	BOOLEAN fLcmResourceFound = FALSE;
     BOOLEAN fInterruptResourceFound = FALSE;
     ULONG interruptIndex = 0;
     NTSTATUS status = STATUS_SUCCESS;
@@ -98,29 +99,21 @@ OnPrepareHardware(
                     ((Type == CM_RESOURCE_CONNECTION_TYPE_SERIAL_I2C) ||
                         (Type == CM_RESOURCE_CONNECTION_TYPE_SERIAL_SPI)))
                 {
-                    if (fSpbResourceFound == FALSE)
-                    {
-                        pDevice->PeripheralId.LowPart =
-                            pDescriptor->u.Connection.IdLowPart;
-                        pDevice->PeripheralId.HighPart =
-                            pDescriptor->u.Connection.IdHighPart;
-
-                        fSpbResourceFound = TRUE;
-
-                        Trace(
-                            TRACE_LEVEL_INFORMATION,
-                            TRACE_FLAG_WDFLOADING,
-                            "SPB resource found with ID=0x%llx",
-                            pDevice->PeripheralId.QuadPart);
-                    }
-                    else
-                    {
-                        Trace(
-                            TRACE_LEVEL_WARNING,
-                            TRACE_FLAG_WDFLOADING,
-                            "Duplicate SPB resource found with ID=0x%llx",
-                            pDevice->PeripheralId.QuadPart);
-                    }
+					switch (pDescriptor->u.Connection.IdLowPart)
+					{
+					case 0x48:
+						pDevice->tmpId.LowPart = pDescriptor->u.Connection.IdLowPart;
+						pDevice->tmpId.HighPart = pDescriptor->u.Connection.IdHighPart;
+						fTmpResourceFound = TRUE;
+						break;
+					case 0x27:
+						pDevice->lcmId.LowPart = pDescriptor->u.Connection.IdLowPart;
+						pDevice->lcmId.HighPart = pDescriptor->u.Connection.IdHighPart;
+						fLcmResourceFound = TRUE;
+						break;
+					default:
+						break;
+					}	
                 }
 
                 break;
@@ -161,13 +154,13 @@ OnPrepareHardware(
     // An SPB resource is required.
     //
 
-    if (fSpbResourceFound == FALSE)
+    if ((fTmpResourceFound && fLcmResourceFound) == FALSE)
     {
         status = STATUS_NOT_FOUND;
         Trace(
             TRACE_LEVEL_ERROR,
             TRACE_FLAG_WDFLOADING,
-            "SPB resource not found - %!STATUS!", 
+            "SPB resources not found - %!STATUS!", 
             status);
     }
 
@@ -220,7 +213,7 @@ OnPrepareHardware(
         }
     }
 
-    FuncExit(TRACE_FLAG_WDFLOADING);
+    //FuncExit(TRACE_FLAG_WDFLOADING);
 
     return status;
 }
@@ -246,7 +239,7 @@ OnReleaseHardware(
 
 --*/
 {
-    FuncEntry(TRACE_FLAG_WDFLOADING);
+    //FuncEntry(TRACE_FLAG_WDFLOADING);
     
     PDEVICE_CONTEXT pDevice = GetDeviceContext(FxDevice);
     NTSTATUS status = STATUS_SUCCESS;
@@ -258,7 +251,7 @@ OnReleaseHardware(
         WdfObjectDelete(pDevice->Interrupt);
     }
 
-    FuncExit(TRACE_FLAG_WDFLOADING);
+    //FuncExit(TRACE_FLAG_WDFLOADING);
 
     return status;
 }
@@ -285,7 +278,7 @@ OnD0Entry(
 
 --*/
 {
-    FuncEntry(TRACE_FLAG_WDFLOADING);
+    //FuncEntry(TRACE_FLAG_WDFLOADING);
     
     UNREFERENCED_PARAMETER(FxPreviousState);
 
@@ -354,7 +347,7 @@ OnD0Entry(
         }
     }
 
-    FuncExit(TRACE_FLAG_WDFLOADING);
+    //FuncExit(TRACE_FLAG_WDFLOADING);
 
     return status;
 }
@@ -381,7 +374,7 @@ OnD0Exit(
 
 --*/
 {
-    FuncEntry(TRACE_FLAG_WDFLOADING);
+    //FuncEntry(TRACE_FLAG_WDFLOADING);
     
     UNREFERENCED_PARAMETER(FxPreviousState);
 
@@ -405,7 +398,7 @@ OnD0Exit(
         pDevice->InputMemory = WDF_NO_HANDLE;
     }
 
-    FuncExit(TRACE_FLAG_WDFLOADING);
+    //FuncExit(TRACE_FLAG_WDFLOADING);
 
     return STATUS_SUCCESS;
 }
@@ -430,7 +423,7 @@ OnFileCleanup(
 
 --*/
 {
-    FuncEntry(TRACE_FLAG_WDFLOADING);
+    //FuncEntry(TRACE_FLAG_WDFLOADING);
 
     WDFDEVICE device;
     PDEVICE_CONTEXT pDevice;
@@ -458,7 +451,7 @@ OnFileCleanup(
             FALSE);
     }
 
-    FuncExit(TRACE_FLAG_WDFLOADING);
+    //FuncExit(TRACE_FLAG_WDFLOADING);
 }
 
 VOID
@@ -484,7 +477,7 @@ OnTopLevelIoDefault(
 
 --*/
 {
-    FuncEntry(TRACE_FLAG_SPBAPI);
+    //FuncEntry(TRACE_FLAG_SPBAPI);
     
     UNREFERENCED_PARAMETER(FxQueue);
 
@@ -524,7 +517,7 @@ OnTopLevelIoDefault(
         }
     }
 
-    FuncExit(TRACE_FLAG_SPBAPI);
+    //FuncExit(TRACE_FLAG_SPBAPI);
 }
 
 VOID
@@ -556,7 +549,7 @@ OnIoRead (
 
 --*/
 {
-    FuncEntry(TRACE_FLAG_SPBAPI);
+    //FuncEntry(TRACE_FLAG_SPBAPI);
     
     UNREFERENCED_PARAMETER(Length);
     
@@ -576,9 +569,9 @@ OnIoRead (
     // Send the read request.
     //
     
-    SpbPeripheralRead(pDevice,FxRequest);
+    SpbPeripheralRead(pDevice, FxRequest);
 
-    FuncExit(TRACE_FLAG_SPBAPI);
+    //FuncExit(TRACE_FLAG_SPBAPI);
 }
 
 VOID
@@ -610,7 +603,7 @@ Return Value:
    None
 --*/
 {
-    FuncEntry(TRACE_FLAG_SPBAPI);
+    //FuncEntry(TRACE_FLAG_SPBAPI);
 
     UNREFERENCED_PARAMETER(Length);
     
@@ -632,7 +625,7 @@ Return Value:
     
     SpbPeripheralWrite(pDevice,FxRequest);
 
-    FuncExit(TRACE_FLAG_SPBAPI);
+    //FuncExit(TRACE_FLAG_SPBAPI);
 }
 
 VOID
@@ -667,12 +660,14 @@ Return Value:
 
 --*/
 {
-    FuncEntry(TRACE_FLAG_SPBAPI);
+    //FuncEntry(TRACE_FLAG_SPBAPI);
 
     WDFDEVICE device;
     PDEVICE_CONTEXT pDevice;
     BOOLEAN fSync = FALSE;
     NTSTATUS status = STATUS_SUCCESS;
+	PCHAR tmp;
+	CHAR LSB, MSB;
 
     UNREFERENCED_PARAMETER(OutputBufferLength);
     UNREFERENCED_PARAMETER(InputBufferLength);
@@ -732,6 +727,41 @@ Return Value:
     case IOCTL_SPBTESTTOOL_SIGNAL_INTERRUPT:
         SpbPeripheralSignalInterrupt(pDevice, FxRequest);
         break;
+
+	case IOCTL_SPBTESTTOOL_MAGIC:
+		fSync = TRUE;
+		pDevice->PeripheralId = pDevice->tmpId;
+		status = SpbPeripheralOpen(pDevice);
+		if (!NT_SUCCESS(status)) {
+			return;
+		}
+		WDFMEMORY memory;
+		PVOID readBuffer;
+		status = WdfMemoryCreate(
+			WDF_NO_OBJECT_ATTRIBUTES,
+			NonPagedPool,
+			0,
+			2,
+			&memory,
+			&readBuffer);
+		if (!NT_SUCCESS(status)) {
+			return;
+		}
+		WDFREQUEST readRequest;
+		status = WdfRequestCreate(
+			WDF_NO_OBJECT_ATTRIBUTES,
+			pDevice->SpbController,
+			&readRequest);
+		if (!NT_SUCCESS(status)) {
+			return;
+		}
+		
+		SpbPeripheralRead(pDevice, readRequest);
+		tmp = (PCHAR)readBuffer;
+		MSB = tmp[0];
+		LSB = tmp[1];
+		status = SpbPeripheralClose(pDevice);
+		break;
         
     default:
         fSync = TRUE;
@@ -760,7 +790,7 @@ Return Value:
         WdfRequestComplete(FxRequest, status);
     }
 
-    FuncExit(TRACE_FLAG_SPBAPI);
+    //FuncExit(TRACE_FLAG_SPBAPI);
 }
 
 BOOLEAN
@@ -789,7 +819,7 @@ OnInterruptIsr(
 
 --*/
 {
-    FuncEntry(TRACE_FLAG_SPBAPI);
+    //FuncEntry(TRACE_FLAG_SPBAPI);
 
     BOOLEAN fInterruptRecognized = TRUE;
     BOOLEAN fNotificationSent;
@@ -842,7 +872,7 @@ OnInterruptIsr(
             "Interrupt detected, but failed to send notification, ignoring");
     }
 
-    FuncExit(TRACE_FLAG_SPBAPI);
+    //FuncExit(TRACE_FLAG_SPBAPI);
 
     return fInterruptRecognized;
 }

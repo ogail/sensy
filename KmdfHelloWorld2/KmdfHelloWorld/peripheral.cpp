@@ -44,7 +44,7 @@ SpbPeripheralOpen(
 
 --*/
 {
-    FuncEntry(TRACE_FLAG_SPBAPI);
+    //FuncEntry(TRACE_FLAG_SPBAPI);
 
     WDF_IO_TARGET_OPEN_PARAMS  openParams;
     NTSTATUS status;
@@ -92,7 +92,7 @@ SpbPeripheralOpen(
             status);
     }
 
-    FuncExit(TRACE_FLAG_SPBAPI);
+    //FuncExit(TRACE_FLAG_SPBAPI);
 
     return status;
 }
@@ -117,7 +117,7 @@ SpbPeripheralClose(
 
 --*/
 {
-    FuncEntry(TRACE_FLAG_SPBAPI);
+    //FuncEntry(TRACE_FLAG_SPBAPI);
 
     Trace(
         TRACE_LEVEL_INFORMATION,
@@ -126,7 +126,7 @@ SpbPeripheralClose(
 
     WdfIoTargetClose(pDevice->SpbController);
 
-    FuncExit(TRACE_FLAG_SPBAPI);
+    //FuncExit(TRACE_FLAG_SPBAPI);
     
     return STATUS_SUCCESS;
 }
@@ -153,7 +153,7 @@ SpbPeripheralLock(
 
 --*/
 {
-    FuncEntry(TRACE_FLAG_SPBAPI);
+    //FuncEntry(TRACE_FLAG_SPBAPI);
 
     UNREFERENCED_PARAMETER(FxRequest);
 
@@ -208,7 +208,7 @@ SpbPeripheralLock(
             0);
     }
 
-    FuncExit(TRACE_FLAG_SPBAPI);
+    //FuncExit(TRACE_FLAG_SPBAPI);
 }
 
 VOID
@@ -233,7 +233,7 @@ SpbPeripheralUnlock(
 
 --*/
 {
-    FuncEntry(TRACE_FLAG_SPBAPI);
+    //FuncEntry(TRACE_FLAG_SPBAPI);
 
     UNREFERENCED_PARAMETER(FxRequest);
 
@@ -288,7 +288,7 @@ SpbPeripheralUnlock(
             0);
     }
 
-    FuncExit(TRACE_FLAG_SPBAPI);
+    //FuncExit(TRACE_FLAG_SPBAPI);
 }
 
 VOID
@@ -313,7 +313,7 @@ SpbPeripheralLockConnection(
 
 --*/
 {
-    FuncEntry(TRACE_FLAG_SPBAPI);
+    //FuncEntry(TRACE_FLAG_SPBAPI);
 
     UNREFERENCED_PARAMETER(FxRequest);
 
@@ -368,7 +368,7 @@ SpbPeripheralLockConnection(
             0);
     }
 
-    FuncExit(TRACE_FLAG_SPBAPI);
+    //FuncExit(TRACE_FLAG_SPBAPI);
 }
 
 VOID
@@ -393,7 +393,7 @@ SpbPeripheralUnlockConnection(
 
 --*/
 {
-    FuncEntry(TRACE_FLAG_SPBAPI);
+    //FuncEntry(TRACE_FLAG_SPBAPI);
 
     UNREFERENCED_PARAMETER(FxRequest);
 
@@ -448,7 +448,7 @@ SpbPeripheralUnlockConnection(
             0);
     }
 
-    FuncExit(TRACE_FLAG_SPBAPI);
+    //FuncExit(TRACE_FLAG_SPBAPI);
 }
 
 VOID
@@ -473,7 +473,7 @@ SpbPeripheralRead(
 
 --*/
 {
-    FuncEntry(TRACE_FLAG_SPBAPI);
+    //FuncEntry(TRACE_FLAG_SPBAPI);
 
     UNREFERENCED_PARAMETER(FxRequest);
 
@@ -534,7 +534,7 @@ SpbPeripheralRead(
             0);
     }
 
-    FuncExit(TRACE_FLAG_SPBAPI);
+    //FuncExit(TRACE_FLAG_SPBAPI);
 }
 
 VOID
@@ -559,7 +559,7 @@ SpbPeripheralWrite(
 
 --*/
 {
-    FuncEntry(TRACE_FLAG_SPBAPI);
+    //FuncEntry(TRACE_FLAG_SPBAPI);
 
     UNREFERENCED_PARAMETER(FxRequest);
 
@@ -620,7 +620,7 @@ SpbPeripheralWrite(
             0);
     }
 
-    FuncExit(TRACE_FLAG_SPBAPI);
+    //FuncExit(TRACE_FLAG_SPBAPI);
 }
 
 VOID
@@ -645,7 +645,7 @@ SpbPeripheralWriteRead(
 
 --*/
 {
-    FuncEntry(TRACE_FLAG_SPBAPI);
+    //FuncEntry(TRACE_FLAG_SPBAPI);
 
     UNREFERENCED_PARAMETER(FxRequest);
 
@@ -839,7 +839,7 @@ Done:
             0);
     }
 
-    FuncExit(TRACE_FLAG_SPBAPI);
+    //FuncExit(TRACE_FLAG_SPBAPI);
 }
 
 VOID
@@ -864,7 +864,7 @@ SpbPeripheralFullDuplex(
 
 --*/
 {
-    FuncEntry(TRACE_FLAG_SPBAPI);
+    //FuncEntry(TRACE_FLAG_SPBAPI);
 
     UNREFERENCED_PARAMETER(FxRequest);
 
@@ -1058,7 +1058,7 @@ Done:
             0);
     }
 
-    FuncExit(TRACE_FLAG_SPBAPI);
+    //FuncExit(TRACE_FLAG_SPBAPI);
 }
 
 VOID
@@ -1083,7 +1083,7 @@ Return Value:
 
 --*/
 {
-    FuncEntry(TRACE_FLAG_SPBAPI);
+    //FuncEntry(TRACE_FLAG_SPBAPI);
 
     NTSTATUS status = STATUS_SUCCESS;
 
@@ -1115,7 +1115,7 @@ Return Value:
 
     WdfRequestComplete(FxRequest, status);
 
-    FuncExit(TRACE_FLAG_SPBAPI);
+    //FuncExit(TRACE_FLAG_SPBAPI);
 }
 
 VOID
@@ -1139,7 +1139,7 @@ Return Value:
 
 --*/
 {
-    FuncEntry(TRACE_FLAG_SPBAPI);
+    //FuncEntry(TRACE_FLAG_SPBAPI);
 
     PREQUEST_CONTEXT pRequest = GetRequestContext(FxRequest);
     NTSTATUS status = STATUS_SUCCESS;
@@ -1196,7 +1196,7 @@ Return Value:
         WdfRequestComplete(FxRequest, status);
     }
 
-    FuncExit(TRACE_FLAG_SPBAPI);
+    //FuncExit(TRACE_FLAG_SPBAPI);
 }
 
 VOID
@@ -1218,7 +1218,7 @@ Return Value:
 
 --*/
 {
-    FuncEntry(TRACE_FLAG_SPBAPI);
+    //FuncEntry(TRACE_FLAG_SPBAPI);
 
     PREQUEST_CONTEXT pRequest;
     PDEVICE_CONTEXT pDevice;
@@ -1253,7 +1253,7 @@ Return Value:
         WdfRequestComplete(FxRequest, STATUS_CANCELLED);
     }
 
-    FuncExit(TRACE_FLAG_SPBAPI);
+    //FuncExit(TRACE_FLAG_SPBAPI);
 }
 
 BOOLEAN
@@ -1275,7 +1275,7 @@ Return Value:
 
 --*/
 {
-    FuncEntry(TRACE_FLAG_SPBAPI);
+    //FuncEntry(TRACE_FLAG_SPBAPI);
 
     WDFREQUEST request;
     BOOLEAN fNotificationSent = FALSE;
@@ -1332,7 +1332,7 @@ Return Value:
             "Interrupt detected without a pended WaitOnInterrupt request");
     }
 
-    FuncExit(TRACE_FLAG_SPBAPI);
+    //FuncExit(TRACE_FLAG_SPBAPI);
 
     return fNotificationSent;
 }
@@ -1361,7 +1361,7 @@ SpbPeripheralSendRequest(
 
 --*/
 {
-    FuncEntry(TRACE_FLAG_SPBAPI);
+    //FuncEntry(TRACE_FLAG_SPBAPI);
     
     PREQUEST_CONTEXT pRequest = GetRequestContext(ClientRequest);
     NTSTATUS status = STATUS_SUCCESS;
@@ -1439,7 +1439,7 @@ SpbPeripheralSendRequest(
         }
     }
 
-    FuncExit(TRACE_FLAG_SPBAPI);
+    //FuncExit(TRACE_FLAG_SPBAPI);
 
     return status;
 }
@@ -1470,7 +1470,7 @@ SpbPeripheralOnCompletion(
 
 --*/
 {
-    FuncEntry(TRACE_FLAG_SPBAPI);
+    //FuncEntry(TRACE_FLAG_SPBAPI);
     
     UNREFERENCED_PARAMETER(FxTarget);
     UNREFERENCED_PARAMETER(Context);
@@ -1540,7 +1540,7 @@ SpbPeripheralOnCompletion(
         status,
         bytesCompleted);
     
-    FuncExit(TRACE_FLAG_SPBAPI);
+    //FuncExit(TRACE_FLAG_SPBAPI);
 }
 
 VOID
@@ -1562,7 +1562,7 @@ Return Value:
 
 --*/
 {
-    FuncEntry(TRACE_FLAG_SPBAPI);
+    //FuncEntry(TRACE_FLAG_SPBAPI);
 
     PREQUEST_CONTEXT pRequest;
     PDEVICE_CONTEXT pDevice;
@@ -1584,7 +1584,7 @@ Return Value:
 
     WdfRequestCancelSentRequest(pDevice->SpbRequest);
 
-    FuncExit(TRACE_FLAG_SPBAPI);
+    //FuncExit(TRACE_FLAG_SPBAPI);
 }
 
 VOID
@@ -1612,7 +1612,7 @@ Return Value:
 
 --*/
 {
-    FuncEntry(TRACE_FLAG_SPBAPI);
+    //FuncEntry(TRACE_FLAG_SPBAPI);
 
     PREQUEST_CONTEXT pRequest;
     pRequest = GetRequestContext(pDevice->SpbRequest);
@@ -1679,5 +1679,5 @@ Return Value:
             bytesCompleted);
     }
 
-    FuncExit(TRACE_FLAG_SPBAPI);
+    //FuncExit(TRACE_FLAG_SPBAPI);
 }

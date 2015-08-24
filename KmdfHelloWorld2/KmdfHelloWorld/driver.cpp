@@ -42,7 +42,7 @@ DriverEntry(
 
     WPP_INIT_TRACING(DriverObject, RegistryPath);
 
-    FuncEntry(TRACE_FLAG_WDFLOADING);
+    //FuncEntry(TRACE_FLAG_WDFLOADING);
 
     WDF_DRIVER_CONFIG_INIT(&driverConfig, OnDeviceAdd);
     driverConfig.DriverPoolTag = SPBT_POOL_TAG;
@@ -75,7 +75,7 @@ DriverEntry(
 
 exit:
 
-    FuncExit(TRACE_FLAG_WDFLOADING);
+    //FuncExit(TRACE_FLAG_WDFLOADING);
 
     return status;
 }
@@ -85,13 +85,13 @@ OnDriverCleanup(
     _In_ WDFOBJECT Object
     )
 {
-    FuncEntry(TRACE_FLAG_WDFLOADING);
+    //FuncEntry(TRACE_FLAG_WDFLOADING);
 
     UNREFERENCED_PARAMETER(Object);
 
     WPP_CLEANUP(nullptr);
 
-    FuncExit(TRACE_FLAG_WDFLOADING);
+    //FuncExit(TRACE_FLAG_WDFLOADING);
 }
 
 NTSTATUS
@@ -117,7 +117,7 @@ OnDeviceAdd(
 
 --*/
 {
-    FuncEntry(TRACE_FLAG_WDFLOADING);
+    //FuncEntry(TRACE_FLAG_WDFLOADING);
 
     PDEVICE_CONTEXT pDevice;
     NTSTATUS status;
@@ -408,7 +408,7 @@ OnDeviceAdd(
 
 exit:
 
-    FuncExit(TRACE_FLAG_WDFLOADING);
+    //FuncExit(TRACE_FLAG_WDFLOADING);
 
     return status;
 }

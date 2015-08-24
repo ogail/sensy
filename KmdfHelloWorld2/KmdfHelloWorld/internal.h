@@ -54,6 +54,19 @@ Revision History:
 typedef struct _DEVICE_CONTEXT  DEVICE_CONTEXT,  *PDEVICE_CONTEXT;
 typedef struct _REQUEST_CONTEXT  REQUEST_CONTEXT,  *PREQUEST_CONTEXT;
 
+#define TRACE_FLAG_SPBAPI
+#define TRACE_FLAG_WDFLOADING
+#define TRACE_LEVEL_INFORMATION
+#define TRACE_LEVEL_ERROR
+#define FuncEntry(x)
+#define FuncExit(x)
+#define WPP_INIT_TRACING(x, y)
+#define WPP_CLEANUP(x)
+#define Trace(a, b, c, d)
+#define Trace(a, b, c, d, e)
+#define Trace(a, b, c, d, e, f)
+#define Trace(a, b, c, d, e, f, g, h)
+
 struct _DEVICE_CONTEXT 
 {
     //
@@ -73,6 +86,18 @@ struct _DEVICE_CONTEXT
     //
 
     LARGE_INTEGER PeripheralId;
+
+	//
+	// Connection ID for SPB peripheral - tmp102
+	//
+
+	LARGE_INTEGER tmpId;
+
+	//
+	// Connection ID for SPB peripheral - lcm1602 iic v1
+	//
+
+	LARGE_INTEGER lcmId;
     
     //
     // Interrupt object and wait event
