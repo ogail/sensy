@@ -26,7 +26,8 @@ Revision History:
 
 NTSTATUS
 SpbPeripheralOpen(
-    _In_  PDEVICE_CONTEXT  pDevice
+    _In_  PDEVICE_CONTEXT  pDevice,
+    _In_  WDFREQUEST       FxRequest
     )
 /*++
  
@@ -44,10 +45,12 @@ SpbPeripheralOpen(
 
 --*/
 {
-    FuncEntry(TRACE_FLAG_SPBAPI);
+    //FuncEntry(TRACE_FLAG_SPBAPI);
 
     WDF_IO_TARGET_OPEN_PARAMS  openParams;
     NTSTATUS status;
+    PVOID pInputBuffer = nullptr;
+    size_t inputBufferLength = 0;
 
     //
     // Create the device path using the connection ID.
@@ -55,16 +58,29 @@ SpbPeripheralOpen(
 
     DECLARE_UNICODE_STRING_SIZE(DevicePath, RESOURCE_HUB_PATH_SIZE);
 
+    status = WdfRequestRetrieveInputBuffer(
+        FxRequest,
+        0,
+        &pInputBuffer,
+        &inputBufferLength);
+
+    if (!NT_SUCCESS(status))
+    {
+        return status;
+    }
+
+    pDevice->PeripheralId.LowPart = ((PULONG)pInputBuffer)[0];
+
     RESOURCE_HUB_CREATE_PATH_FROM_ID(
         &DevicePath,
         pDevice->PeripheralId.LowPart,
         pDevice->PeripheralId.HighPart);
 
-    Trace(
+    /*Trace(
         TRACE_LEVEL_INFORMATION,
         TRACE_FLAG_SPBAPI,
         "Opening handle to SPB target via %wZ",
-        &DevicePath);
+        &DevicePath);*/
 
     //
     // Open a handle to the SPB controller.
@@ -85,14 +101,14 @@ SpbPeripheralOpen(
      
     if (!NT_SUCCESS(status)) 
     {
-        Trace(
+        /*Trace(
             TRACE_LEVEL_ERROR,
             TRACE_FLAG_SPBAPI,
             "Failed to open SPB target - %!STATUS!",
-            status);
+            status);*/
     }
 
-    FuncExit(TRACE_FLAG_SPBAPI);
+    //FuncExit(TRACE_FLAG_SPBAPI);
 
     return status;
 }
@@ -117,16 +133,16 @@ SpbPeripheralClose(
 
 --*/
 {
-    FuncEntry(TRACE_FLAG_SPBAPI);
+    //FuncEntry(TRACE_FLAG_SPBAPI);
 
-    Trace(
+    /*Trace(
         TRACE_LEVEL_INFORMATION,
         TRACE_FLAG_SPBAPI,
-        "Closing handle to SPB target");
+        "Closing handle to SPB target");*/
 
     WdfIoTargetClose(pDevice->SpbController);
 
-    FuncExit(TRACE_FLAG_SPBAPI);
+    //FuncExit(TRACE_FLAG_SPBAPI);
     
     return STATUS_SUCCESS;
 }
@@ -153,17 +169,17 @@ SpbPeripheralLock(
 
 --*/
 {
-    FuncEntry(TRACE_FLAG_SPBAPI);
+    //FuncEntry(TRACE_FLAG_SPBAPI);
 
     UNREFERENCED_PARAMETER(FxRequest);
 
     NTSTATUS status;
 
-    Trace(
+    /*Trace(
         TRACE_LEVEL_INFORMATION,
         TRACE_FLAG_SPBAPI,
         "Formatting SPB request %p for IOCTL_SPB_LOCK_CONTROLLER",
-        pDevice->SpbRequest);
+        pDevice->SpbRequest);*/
         
     //
     // Save the client request.
@@ -194,13 +210,13 @@ SpbPeripheralLock(
 
     if (!NT_SUCCESS(status))
     {
-        Trace(
+        /*Trace(
             TRACE_LEVEL_ERROR,
             TRACE_FLAG_SPBAPI,
             "Failed to send SPB request %p for "
             "IOCTL_SPB_LOCK_CONTROLLER - %!STATUS!",
             pDevice->SpbRequest,
-            status);
+            status);*/
 
         SpbPeripheralCompleteRequestPair(
             pDevice,
@@ -208,7 +224,7 @@ SpbPeripheralLock(
             0);
     }
 
-    FuncExit(TRACE_FLAG_SPBAPI);
+    //FuncExit(TRACE_FLAG_SPBAPI);
 }
 
 VOID
@@ -233,17 +249,17 @@ SpbPeripheralUnlock(
 
 --*/
 {
-    FuncEntry(TRACE_FLAG_SPBAPI);
+    //FuncEntry(TRACE_FLAG_SPBAPI);
 
     UNREFERENCED_PARAMETER(FxRequest);
 
     NTSTATUS status;
 
-    Trace(
+    /*Trace(
         TRACE_LEVEL_INFORMATION,
         TRACE_FLAG_SPBAPI,
         "Formatting SPB request %p for IOCTL_SPB_UNLOCK_CONTROLLER",
-        pDevice->SpbRequest);
+        pDevice->SpbRequest);*/
         
     //
     // Save the client request.
@@ -274,13 +290,13 @@ SpbPeripheralUnlock(
 
     if (!NT_SUCCESS(status))
     {
-        Trace(
+        /*Trace(
             TRACE_LEVEL_ERROR,
             TRACE_FLAG_SPBAPI,
             "Failed to send SPB request %p for "
             "IOCTL_SPB_UNLOCK_CONTROLLER - %!STATUS!",
             pDevice->SpbRequest,
-            status);
+            status);*/
 
         SpbPeripheralCompleteRequestPair(
             pDevice,
@@ -288,7 +304,7 @@ SpbPeripheralUnlock(
             0);
     }
 
-    FuncExit(TRACE_FLAG_SPBAPI);
+    //FuncExit(TRACE_FLAG_SPBAPI);
 }
 
 VOID
@@ -313,17 +329,17 @@ SpbPeripheralLockConnection(
 
 --*/
 {
-    FuncEntry(TRACE_FLAG_SPBAPI);
+    //FuncEntry(TRACE_FLAG_SPBAPI);
 
     UNREFERENCED_PARAMETER(FxRequest);
 
     NTSTATUS status;
 
-    Trace(
+    /*Trace(
         TRACE_LEVEL_INFORMATION,
         TRACE_FLAG_SPBAPI,
         "Formatting SPB request %p for IOCTL_SPB_LOCK_CONNECTION",
-        pDevice->SpbRequest);
+        pDevice->SpbRequest);*/
         
     //
     // Save the client request.
@@ -354,13 +370,13 @@ SpbPeripheralLockConnection(
 
     if (!NT_SUCCESS(status))
     {
-        Trace(
+        /*Trace(
             TRACE_LEVEL_ERROR,
             TRACE_FLAG_SPBAPI,
             "Failed to send SPB request %p for "
             "IOCTL_SPB_LOCK_CONNECTION - %!STATUS!",
             pDevice->SpbRequest,
-            status);
+            status);*/
 
         SpbPeripheralCompleteRequestPair(
             pDevice,
@@ -368,7 +384,7 @@ SpbPeripheralLockConnection(
             0);
     }
 
-    FuncExit(TRACE_FLAG_SPBAPI);
+    //FuncExit(TRACE_FLAG_SPBAPI);
 }
 
 VOID
@@ -393,17 +409,17 @@ SpbPeripheralUnlockConnection(
 
 --*/
 {
-    FuncEntry(TRACE_FLAG_SPBAPI);
+    //FuncEntry(TRACE_FLAG_SPBAPI);
 
     UNREFERENCED_PARAMETER(FxRequest);
 
     NTSTATUS status;
 
-    Trace(
+    /*Trace(
         TRACE_LEVEL_INFORMATION,
         TRACE_FLAG_SPBAPI,
         "Formatting SPB request %p for IOCTL_SPB_UNLOCK_CONNECTION",
-        pDevice->SpbRequest);
+        pDevice->SpbRequest);*/
         
     //
     // Save the client request.
@@ -434,13 +450,13 @@ SpbPeripheralUnlockConnection(
 
     if (!NT_SUCCESS(status))
     {
-        Trace(
+        /*Trace(
             TRACE_LEVEL_ERROR,
             TRACE_FLAG_SPBAPI,
             "Failed to send SPB request %p for "
             "IOCTL_SPB_UNLOCK_CONNECTION - %!STATUS!",
             pDevice->SpbRequest,
-            status);
+            status);*/
 
         SpbPeripheralCompleteRequestPair(
             pDevice,
@@ -448,7 +464,7 @@ SpbPeripheralUnlockConnection(
             0);
     }
 
-    FuncExit(TRACE_FLAG_SPBAPI);
+    //FuncExit(TRACE_FLAG_SPBAPI);
 }
 
 VOID
@@ -473,18 +489,18 @@ SpbPeripheralRead(
 
 --*/
 {
-    FuncEntry(TRACE_FLAG_SPBAPI);
+    //FuncEntry(TRACE_FLAG_SPBAPI);
 
     UNREFERENCED_PARAMETER(FxRequest);
 
     WDFMEMORY memory = nullptr;
     NTSTATUS status;
 
-    Trace(
+    /*Trace(
         TRACE_LEVEL_INFORMATION,
         TRACE_FLAG_SPBAPI,
         "Formatting SPB request %p for read",
-        pDevice->SpbRequest);
+        pDevice->SpbRequest);*/
         
     //
     // Save the client request.
@@ -520,13 +536,13 @@ SpbPeripheralRead(
 
     if (!NT_SUCCESS(status))
     {
-        Trace(
+        /*Trace(
             TRACE_LEVEL_ERROR,
             TRACE_FLAG_SPBAPI,
             "Failed to send SPB request %p for "
             "read - %!STATUS!",
             pDevice->SpbRequest,
-            status);
+            status);*/
 
         SpbPeripheralCompleteRequestPair(
             pDevice,
@@ -534,7 +550,7 @@ SpbPeripheralRead(
             0);
     }
 
-    FuncExit(TRACE_FLAG_SPBAPI);
+    //FuncExit(TRACE_FLAG_SPBAPI);
 }
 
 VOID
@@ -559,18 +575,18 @@ SpbPeripheralWrite(
 
 --*/
 {
-    FuncEntry(TRACE_FLAG_SPBAPI);
+    //FuncEntry(TRACE_FLAG_SPBAPI);
 
     UNREFERENCED_PARAMETER(FxRequest);
 
     WDFMEMORY memory = nullptr;
     NTSTATUS status;
 
-    Trace(
+    /*Trace(
         TRACE_LEVEL_INFORMATION,
         TRACE_FLAG_SPBAPI,
         "Formatting SPB request %p for write",
-        pDevice->SpbRequest);
+        pDevice->SpbRequest);*/
         
     //
     // Save the client request.
@@ -606,13 +622,13 @@ SpbPeripheralWrite(
 
     if (!NT_SUCCESS(status))
     {
-        Trace(
+        /*Trace(
             TRACE_LEVEL_ERROR,
             TRACE_FLAG_SPBAPI,
             "Failed to send SPB request %p for "
             "write - %!STATUS!",
             pDevice->SpbRequest,
-            status);
+            status);*/
 
         SpbPeripheralCompleteRequestPair(
             pDevice,
@@ -620,7 +636,7 @@ SpbPeripheralWrite(
             0);
     }
 
-    FuncExit(TRACE_FLAG_SPBAPI);
+    //FuncExit(TRACE_FLAG_SPBAPI);
 }
 
 VOID
@@ -645,7 +661,7 @@ SpbPeripheralWriteRead(
 
 --*/
 {
-    FuncEntry(TRACE_FLAG_SPBAPI);
+    //FuncEntry(TRACE_FLAG_SPBAPI);
 
     UNREFERENCED_PARAMETER(FxRequest);
 
@@ -659,11 +675,11 @@ SpbPeripheralWriteRead(
 
     pRequest = GetRequestContext(pDevice->SpbRequest);
 
-    Trace(
+    /*Trace(
         TRACE_LEVEL_INFORMATION,
         TRACE_FLAG_SPBAPI,
         "Formatting SPB request %p for IOCTL_SPB_EXECUTE_SEQUENCE",
-        pDevice->SpbRequest);
+        pDevice->SpbRequest);*/
         
     //
     // Save the client request.
@@ -683,11 +699,11 @@ SpbPeripheralWriteRead(
 
     if (!NT_SUCCESS(status))
     {
-        Trace(
+        /*Trace(
             TRACE_LEVEL_ERROR,
             TRACE_FLAG_SPBAPI,
             "Failed to retrieve input buffer - %!STATUS!",
-            status);
+            status);*/
 
         goto Done;
     }
@@ -700,11 +716,11 @@ SpbPeripheralWriteRead(
 
     if (!NT_SUCCESS(status))
     {
-        Trace(
+        /*Trace(
             TRACE_LEVEL_ERROR,
             TRACE_FLAG_SPBAPI,
             "Failed to retrieve output buffer - %!STATUS!",
-            status);
+            status);*/
 
         goto Done;
     }
@@ -757,21 +773,21 @@ SpbPeripheralWriteRead(
 
     if (!NT_SUCCESS(status))
     {
-        Trace(
+        /*Trace(
             TRACE_LEVEL_ERROR,
             TRACE_FLAG_SPBAPI,
             "Failed to create WDFMEMORY - %!STATUS!",
-            status);
+            status);*/
 
         goto Done;
     }
 
-    Trace(
+    /*Trace(
         TRACE_LEVEL_INFORMATION,
         TRACE_FLAG_SPBAPI,
         "Built write-read sequence %p with byte length=%lu",
         &seq,
-        (ULONG)(inputBufferLength + outputBufferLength));
+        (ULONG)(inputBufferLength + outputBufferLength));*/
 
     //
     // Send sequence IOCTL.
@@ -802,11 +818,11 @@ SpbPeripheralWriteRead(
 
     if (!NT_SUCCESS(status))
     {
-        Trace(
+        /*Trace(
             TRACE_LEVEL_ERROR,
             TRACE_FLAG_SPBAPI,
             "Failed to format request - %!STATUS!",
-            status);
+            status);*/
 
         goto Done;
     }
@@ -818,13 +834,13 @@ SpbPeripheralWriteRead(
 
     if (!NT_SUCCESS(status))
     {
-        Trace(
+        /*Trace(
             TRACE_LEVEL_ERROR,
             TRACE_FLAG_SPBAPI,
             "Failed to send SPB request %p for "
             "IOCTL_SPB_EXECUTE_SEQUENCE - %!STATUS!",
             pDevice->SpbRequest,
-            status);
+            status);*/
 
         goto Done;
     }
@@ -839,7 +855,7 @@ Done:
             0);
     }
 
-    FuncExit(TRACE_FLAG_SPBAPI);
+    //FuncExit(TRACE_FLAG_SPBAPI);
 }
 
 VOID
@@ -864,7 +880,7 @@ SpbPeripheralFullDuplex(
 
 --*/
 {
-    FuncEntry(TRACE_FLAG_SPBAPI);
+    //FuncEntry(TRACE_FLAG_SPBAPI);
 
     UNREFERENCED_PARAMETER(FxRequest);
 
@@ -878,11 +894,11 @@ SpbPeripheralFullDuplex(
 
     pRequest = GetRequestContext(pDevice->SpbRequest);
 
-    Trace(
+    /*Trace(
         TRACE_LEVEL_INFORMATION,
         TRACE_FLAG_SPBAPI,
         "Formatting SPB request %p for IOCTL_SPB_FULL_DUPLEX",
-        pDevice->SpbRequest);
+        pDevice->SpbRequest);*/
         
     //
     // Save the client request.
@@ -902,11 +918,11 @@ SpbPeripheralFullDuplex(
 
     if (!NT_SUCCESS(status))
     {
-        Trace(
+        /*Trace(
             TRACE_LEVEL_ERROR,
             TRACE_FLAG_SPBAPI,
             "Failed to retrieve input buffer - %!STATUS!",
-            status);
+            status);*/
 
         goto Done;
     }
@@ -919,11 +935,11 @@ SpbPeripheralFullDuplex(
 
     if (!NT_SUCCESS(status))
     {
-        Trace(
+        /*Trace(
             TRACE_LEVEL_ERROR,
             TRACE_FLAG_SPBAPI,
             "Failed to retrieve output buffer - %!STATUS!",
-            status);
+            status);*/
 
         goto Done;
     }
@@ -976,21 +992,21 @@ SpbPeripheralFullDuplex(
 
     if (!NT_SUCCESS(status))
     {
-        Trace(
+        /*Trace(
             TRACE_LEVEL_ERROR,
             TRACE_FLAG_SPBAPI,
             "Failed to create WDFMEMORY - %!STATUS!",
-            status);
+            status);*/
 
         goto Done;
     }
 
-    Trace(
+    /*Trace(
         TRACE_LEVEL_INFORMATION,
         TRACE_FLAG_SPBAPI,
         "Built full duplex transfer %p with byte length=%lu",
         &seq,
-        (ULONG)(inputBufferLength + outputBufferLength));
+        (ULONG)(inputBufferLength + outputBufferLength));*/
 
     //
     // Send full duplex IOCTL.
@@ -1021,11 +1037,11 @@ SpbPeripheralFullDuplex(
 
     if (!NT_SUCCESS(status))
     {
-        Trace(
+        /*Trace(
             TRACE_LEVEL_ERROR,
             TRACE_FLAG_SPBAPI,
             "Failed to format request - %!STATUS!",
-            status);
+            status);*/
 
         goto Done;
     }
@@ -1037,13 +1053,13 @@ SpbPeripheralFullDuplex(
 
     if (!NT_SUCCESS(status))
     {
-        Trace(
+        /*Trace(
             TRACE_LEVEL_ERROR,
             TRACE_FLAG_SPBAPI,
             "Failed to send SPB request %p for "
             "IOCTL_SPB_FULL_DUPLEX - %!STATUS!",
             pDevice->SpbRequest,
-            status);
+            status);*/
 
         goto Done;
     }
@@ -1058,7 +1074,7 @@ Done:
             0);
     }
 
-    FuncExit(TRACE_FLAG_SPBAPI);
+    //FuncExit(TRACE_FLAG_SPBAPI);
 }
 
 VOID
@@ -1083,7 +1099,7 @@ Return Value:
 
 --*/
 {
-    FuncEntry(TRACE_FLAG_SPBAPI);
+    //FuncEntry(TRACE_FLAG_SPBAPI);
 
     NTSTATUS status = STATUS_SUCCESS;
 
@@ -1098,24 +1114,24 @@ Return Value:
             IO_NO_INCREMENT,
             FALSE);
 
-        Trace(
+        /*Trace(
             TRACE_LEVEL_INFORMATION,
             TRACE_FLAG_SPBAPI,
-            "Setting ISR wait event");
+            "Setting ISR wait event");*/
     }
     else
     {
         status = STATUS_NOT_FOUND;
-        Trace(
+        /*Trace(
             TRACE_LEVEL_WARNING,
             TRACE_FLAG_SPBAPI,
             "No interrupt object found, ignoring - %!STATUS!",
-            status);
+            status);*/
     }
 
     WdfRequestComplete(FxRequest, status);
 
-    FuncExit(TRACE_FLAG_SPBAPI);
+    //FuncExit(TRACE_FLAG_SPBAPI);
 }
 
 VOID
@@ -1139,7 +1155,7 @@ Return Value:
 
 --*/
 {
-    FuncEntry(TRACE_FLAG_SPBAPI);
+    //FuncEntry(TRACE_FLAG_SPBAPI);
 
     PREQUEST_CONTEXT pRequest = GetRequestContext(FxRequest);
     NTSTATUS status = STATUS_SUCCESS;
@@ -1158,12 +1174,12 @@ Return Value:
 
         if (!NT_SUCCESS(status))
         {
-            Trace(
+            /*Trace(
                 TRACE_LEVEL_ERROR,
                 TRACE_FLAG_SPBAPI,
                 "Failed to mark WaitOnInterrupt request %p cancellable - %!STATUS!",
                 FxRequest,
-                status);
+                status);*/
         }
 
         //
@@ -1172,11 +1188,11 @@ Return Value:
 
         if (NT_SUCCESS(status))
         {
-            Trace(
+            /*Trace(
                 TRACE_LEVEL_INFORMATION,
                 TRACE_FLAG_SPBAPI,
                 "WaitOnInterrupt request %p pended",
-                FxRequest);
+                FxRequest);*/
 
             pDevice->WaitOnInterruptRequest = FxRequest;
         }
@@ -1184,11 +1200,11 @@ Return Value:
     else
     {
         status = STATUS_INVALID_DEVICE_STATE;
-        Trace(
+        /*Trace(
             TRACE_LEVEL_WARNING,
             TRACE_FLAG_SPBAPI,
             "Cannont pend multiple WaitOnInterrupt requests, ignoring - %!STATUS!",
-            status);
+            status);*/
     }
 
     if (!NT_SUCCESS(status))
@@ -1196,7 +1212,7 @@ Return Value:
         WdfRequestComplete(FxRequest, status);
     }
 
-    FuncExit(TRACE_FLAG_SPBAPI);
+    //FuncExit(TRACE_FLAG_SPBAPI);
 }
 
 VOID
@@ -1218,7 +1234,7 @@ Return Value:
 
 --*/
 {
-    FuncEntry(TRACE_FLAG_SPBAPI);
+    //FuncEntry(TRACE_FLAG_SPBAPI);
 
     PREQUEST_CONTEXT pRequest;
     PDEVICE_CONTEXT pDevice;
@@ -1232,28 +1248,28 @@ Return Value:
 
     if (FxRequest == pDevice->WaitOnInterruptRequest)
     {    
-        Trace(
+        /*Trace(
             TRACE_LEVEL_INFORMATION,
             TRACE_FLAG_SPBAPI,
             "WaitOnInterrupt request %p cancelled",
-            FxRequest);
+            FxRequest);*/
 
         pDevice->WaitOnInterruptRequest = nullptr;
         WdfRequestComplete(FxRequest, STATUS_CANCELLED);
     }
     else
     {
-        Trace(
+        /*Trace(
             TRACE_LEVEL_WARNING,
             TRACE_FLAG_SPBAPI,
             "Cancel for WDFREQUEST %p without WaitOnInterrupt request pended,"
             "will complete as cancelled anyway",
-            FxRequest);
+            FxRequest);*/
 
         WdfRequestComplete(FxRequest, STATUS_CANCELLED);
     }
 
-    FuncExit(TRACE_FLAG_SPBAPI);
+    //FuncExit(TRACE_FLAG_SPBAPI);
 }
 
 BOOLEAN
@@ -1275,7 +1291,7 @@ Return Value:
 
 --*/
 {
-    FuncEntry(TRACE_FLAG_SPBAPI);
+    //FuncEntry(TRACE_FLAG_SPBAPI);
 
     WDFREQUEST request;
     BOOLEAN fNotificationSent = FALSE;
@@ -1294,45 +1310,45 @@ Return Value:
 
         if (NT_SUCCESS(status))
         {
-            Trace(
+            /*Trace(
                 TRACE_LEVEL_INFORMATION,
                 TRACE_FLAG_SPBAPI,
                 "Interrupt detected, WaitOnInterrupt request %p completed",
-                pDevice->WaitOnInterruptRequest);
+                pDevice->WaitOnInterruptRequest);*/
 
             WdfRequestComplete(request, STATUS_SUCCESS);
             fNotificationSent = TRUE;
         }
         else if (status == STATUS_CANCELLED)
         {
-            Trace(
+            /*Trace(
                 TRACE_LEVEL_INFORMATION,
                 TRACE_FLAG_SPBAPI,
                 "Interrupt detected with WaitOnInterrupt request %p "
                 "already completed - %!STATUS!",
                 pDevice->WaitOnInterruptRequest,
-                status);
+                status);*/
         }
         else
         {
-            Trace(
+            /*Trace(
                 TRACE_LEVEL_ERROR,
                 TRACE_FLAG_SPBAPI,
                 "Interrupt detected but failed to unmark WaitOnInterrupt "
                 "request %p as cancellable - %!STATUS!",
                 pDevice->WaitOnInterruptRequest,
-                status);
+                status);*/
         }
     }
     else
     {
-        Trace(
+        /*Trace(
             TRACE_LEVEL_WARNING,
             TRACE_FLAG_SPBAPI,
-            "Interrupt detected without a pended WaitOnInterrupt request");
+            "Interrupt detected without a pended WaitOnInterrupt request");*/
     }
 
-    FuncExit(TRACE_FLAG_SPBAPI);
+    //FuncExit(TRACE_FLAG_SPBAPI);
 
     return fNotificationSent;
 }
@@ -1361,18 +1377,18 @@ SpbPeripheralSendRequest(
 
 --*/
 {
-    FuncEntry(TRACE_FLAG_SPBAPI);
+    //FuncEntry(TRACE_FLAG_SPBAPI);
     
     PREQUEST_CONTEXT pRequest = GetRequestContext(ClientRequest);
     NTSTATUS status = STATUS_SUCCESS;
 
-    Trace(
+    /*Trace(
         TRACE_LEVEL_INFORMATION,
         TRACE_FLAG_SPBAPI,
         "Saving client request %p, and "
         "sending SPB request %p",
         ClientRequest,
-        SpbRequest);
+        SpbRequest);*/
 
     //
     // Init client request context.
@@ -1413,12 +1429,12 @@ SpbPeripheralSendRequest(
         {
             status = WdfRequestGetStatus(SpbRequest);
 
-            Trace(
+            /*Trace(
                 TRACE_LEVEL_ERROR,
                 TRACE_FLAG_SPBAPI,
                 "Failed to send SPB request %p - %!STATUS!",
                 SpbRequest,
-                status);
+                status);*/
 
             NTSTATUS cancelStatus;
             cancelStatus = WdfRequestUnmarkCancelable(ClientRequest);
@@ -1428,18 +1444,18 @@ SpbPeripheralSendRequest(
                 NT_ASSERTMSG("WdfRequestUnmarkCancelable should only fail if request has already been cancelled",
                     cancelStatus == STATUS_CANCELLED);
 
-                Trace(
+                /*Trace(
                     TRACE_LEVEL_INFORMATION, 
                     TRACE_FLAG_SPBAPI, 
                     "Client request %p has already been cancelled - "
                     "%!STATUS!",
                     ClientRequest,
-                    cancelStatus);
+                    cancelStatus);*/
             }
         }
     }
 
-    FuncExit(TRACE_FLAG_SPBAPI);
+    //FuncExit(TRACE_FLAG_SPBAPI);
 
     return status;
 }
@@ -1470,7 +1486,7 @@ SpbPeripheralOnCompletion(
 
 --*/
 {
-    FuncEntry(TRACE_FLAG_SPBAPI);
+    //FuncEntry(TRACE_FLAG_SPBAPI);
     
     UNREFERENCED_PARAMETER(FxTarget);
     UNREFERENCED_PARAMETER(Context);
@@ -1486,12 +1502,12 @@ SpbPeripheralOnCompletion(
 
     status = Params->IoStatus.Status;
 
-    Trace(
+    /*Trace(
         TRACE_LEVEL_INFORMATION,
         TRACE_FLAG_SPBAPI,
         "Completion callback received for SPB request %p with %!STATUS!",
         FxRequest,
-        status);
+        status);*/
 
     //
     // Unmark the client request as cancellable
@@ -1504,12 +1520,12 @@ SpbPeripheralOnCompletion(
         NT_ASSERTMSG("WdfRequestUnmarkCancelable should only fail if request has already been cancelled",
             cancelStatus == STATUS_CANCELLED);
 
-        Trace(
+        /*Trace(
             TRACE_LEVEL_INFORMATION, 
             TRACE_FLAG_SPBAPI, 
             "Client request %p has already been cancelled - %!STATUS!",
             pDevice->ClientRequest,
-            cancelStatus);
+            cancelStatus);*/
     }
 
     //
@@ -1540,7 +1556,7 @@ SpbPeripheralOnCompletion(
         status,
         bytesCompleted);
     
-    FuncExit(TRACE_FLAG_SPBAPI);
+    //FuncExit(TRACE_FLAG_SPBAPI);
 }
 
 VOID
@@ -1562,7 +1578,7 @@ Return Value:
 
 --*/
 {
-    FuncEntry(TRACE_FLAG_SPBAPI);
+    //FuncEntry(TRACE_FLAG_SPBAPI);
 
     PREQUEST_CONTEXT pRequest;
     PDEVICE_CONTEXT pDevice;
@@ -1574,17 +1590,17 @@ Return Value:
     // Attempt to cancel the SPB request
     //
     
-    Trace(
+    /*Trace(
         TRACE_LEVEL_INFORMATION,
         TRACE_FLAG_SPBAPI,
         "Cancel received for client request %p, "
         "attempting to cancel SPB request %p",
         FxRequest,
-        pDevice->SpbRequest);
+        pDevice->SpbRequest);*/
 
     WdfRequestCancelSentRequest(pDevice->SpbRequest);
 
-    FuncExit(TRACE_FLAG_SPBAPI);
+    //FuncExit(TRACE_FLAG_SPBAPI);
 }
 
 VOID
@@ -1612,12 +1628,12 @@ Return Value:
 
 --*/
 {
-    FuncEntry(TRACE_FLAG_SPBAPI);
+    //FuncEntry(TRACE_FLAG_SPBAPI);
 
     PREQUEST_CONTEXT pRequest;
     pRequest = GetRequestContext(pDevice->SpbRequest);
 
-    Trace(
+    /*Trace(
         TRACE_LEVEL_INFORMATION,
         TRACE_FLAG_SPBAPI,
         "Marking SPB request %p for reuse, and completing "
@@ -1625,7 +1641,7 @@ Return Value:
         pDevice->SpbRequest,
         pDevice->ClientRequest,
         status,
-        (ULONG)bytesCompleted);
+        (ULONG)bytesCompleted);*/
 
     //
     // Mark the SPB request as reuse
@@ -1679,5 +1695,5 @@ Return Value:
             bytesCompleted);
     }
 
-    FuncExit(TRACE_FLAG_SPBAPI);
+    //FuncExit(TRACE_FLAG_SPBAPI);
 }

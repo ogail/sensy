@@ -9,19 +9,19 @@ DefinitionBlock ("ACPITABL.dat", "SSDT", 0x1, "Ogail", "SPBT", 0x1)
 {
     Scope (\_SB)
     {
-		Device(SPBT)
-		{
-			Name(_HID, "SpbTestTool")
-			Name(_UID, 1)
-			Method(_CRS, 0x0, NotSerialized)
-			{
-				Name (RBUF, ResourceTemplate ()
-				{
-					I2CSerialBus(0x48, ControllerInitiated, 400000, AddressingMode7Bit, "\\_SB.I2C1", , )
-					I2CSerialBus(0x27, ControllerInitiated, 400000, AddressingMode7Bit, "\\_SB.I2C1", , )
-				})
-				Return(RBUF)
-			}
-		}
+        Device(SPBT)
+        {
+            Name(_HID, "SpbTestTool")
+            Name(_UID, 1)
+            Method(_CRS, 0x0, NotSerialized)
+            {
+                Name (RBUF, ResourceTemplate ()
+                {
+                    I2CSerialBus(0x27, ControllerInitiated, 400000, AddressingMode7Bit, "\\_SB.I2C1", , )
+                    I2CSerialBus(0x48, ControllerInitiated, 400000, AddressingMode7Bit, "\\_SB.I2C1", , )
+                })
+                Return(RBUF)
+            }
+        }
     }
 }

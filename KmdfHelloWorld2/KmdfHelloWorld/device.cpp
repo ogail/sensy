@@ -58,7 +58,7 @@ OnPrepareHardware(
 
 --*/
 {
-    FuncEntry(TRACE_FLAG_WDFLOADING);
+    //FuncEntry(TRACE_FLAG_WDFLOADING);
 
     PDEVICE_CONTEXT pDevice = GetDeviceContext(FxDevice);
     BOOLEAN fSpbResourceFound = FALSE;
@@ -220,7 +220,7 @@ OnPrepareHardware(
         }
     }
 
-    FuncExit(TRACE_FLAG_WDFLOADING);
+    //FuncExit(TRACE_FLAG_WDFLOADING);
 
     return status;
 }
@@ -246,7 +246,7 @@ OnReleaseHardware(
 
 --*/
 {
-    FuncEntry(TRACE_FLAG_WDFLOADING);
+    //FuncEntry(TRACE_FLAG_WDFLOADING);
     
     PDEVICE_CONTEXT pDevice = GetDeviceContext(FxDevice);
     NTSTATUS status = STATUS_SUCCESS;
@@ -258,7 +258,7 @@ OnReleaseHardware(
         WdfObjectDelete(pDevice->Interrupt);
     }
 
-    FuncExit(TRACE_FLAG_WDFLOADING);
+    //FuncExit(TRACE_FLAG_WDFLOADING);
 
     return status;
 }
@@ -285,7 +285,7 @@ OnD0Entry(
 
 --*/
 {
-    FuncEntry(TRACE_FLAG_WDFLOADING);
+    //FuncEntry(TRACE_FLAG_WDFLOADING);
     
     UNREFERENCED_PARAMETER(FxPreviousState);
 
@@ -354,7 +354,7 @@ OnD0Entry(
         }
     }
 
-    FuncExit(TRACE_FLAG_WDFLOADING);
+    //FuncExit(TRACE_FLAG_WDFLOADING);
 
     return status;
 }
@@ -381,7 +381,7 @@ OnD0Exit(
 
 --*/
 {
-    FuncEntry(TRACE_FLAG_WDFLOADING);
+    //FuncEntry(TRACE_FLAG_WDFLOADING);
     
     UNREFERENCED_PARAMETER(FxPreviousState);
 
@@ -405,7 +405,7 @@ OnD0Exit(
         pDevice->InputMemory = WDF_NO_HANDLE;
     }
 
-    FuncExit(TRACE_FLAG_WDFLOADING);
+    //FuncExit(TRACE_FLAG_WDFLOADING);
 
     return STATUS_SUCCESS;
 }
@@ -430,7 +430,7 @@ OnFileCleanup(
 
 --*/
 {
-    FuncEntry(TRACE_FLAG_WDFLOADING);
+    //FuncEntry(TRACE_FLAG_WDFLOADING);
 
     WDFDEVICE device;
     PDEVICE_CONTEXT pDevice;
@@ -458,7 +458,7 @@ OnFileCleanup(
             FALSE);
     }
 
-    FuncExit(TRACE_FLAG_WDFLOADING);
+    //FuncExit(TRACE_FLAG_WDFLOADING);
 }
 
 VOID
@@ -484,7 +484,7 @@ OnTopLevelIoDefault(
 
 --*/
 {
-    FuncEntry(TRACE_FLAG_SPBAPI);
+    //FuncEntry(TRACE_FLAG_SPBAPI);
     
     UNREFERENCED_PARAMETER(FxQueue);
 
@@ -524,7 +524,7 @@ OnTopLevelIoDefault(
         }
     }
 
-    FuncExit(TRACE_FLAG_SPBAPI);
+    //FuncExit(TRACE_FLAG_SPBAPI);
 }
 
 VOID
@@ -556,7 +556,7 @@ OnIoRead (
 
 --*/
 {
-    FuncEntry(TRACE_FLAG_SPBAPI);
+    //FuncEntry(TRACE_FLAG_SPBAPI);
     
     UNREFERENCED_PARAMETER(Length);
     
@@ -578,7 +578,7 @@ OnIoRead (
     
     SpbPeripheralRead(pDevice,FxRequest);
 
-    FuncExit(TRACE_FLAG_SPBAPI);
+    //FuncExit(TRACE_FLAG_SPBAPI);
 }
 
 VOID
@@ -610,7 +610,7 @@ Return Value:
    None
 --*/
 {
-    FuncEntry(TRACE_FLAG_SPBAPI);
+    //FuncEntry(TRACE_FLAG_SPBAPI);
 
     UNREFERENCED_PARAMETER(Length);
     
@@ -632,7 +632,7 @@ Return Value:
     
     SpbPeripheralWrite(pDevice,FxRequest);
 
-    FuncExit(TRACE_FLAG_SPBAPI);
+    //FuncExit(TRACE_FLAG_SPBAPI);
 }
 
 VOID
@@ -667,7 +667,7 @@ Return Value:
 
 --*/
 {
-    FuncEntry(TRACE_FLAG_SPBAPI);
+    //FuncEntry(TRACE_FLAG_SPBAPI);
 
     WDFDEVICE device;
     PDEVICE_CONTEXT pDevice;
@@ -697,7 +697,7 @@ Return Value:
     {
     case IOCTL_SPBTESTTOOL_OPEN:
         fSync = TRUE;
-        status = SpbPeripheralOpen(pDevice);
+        status = SpbPeripheralOpen(pDevice, FxRequest);
         break;
 
     case IOCTL_SPBTESTTOOL_CLOSE:
@@ -760,7 +760,7 @@ Return Value:
         WdfRequestComplete(FxRequest, status);
     }
 
-    FuncExit(TRACE_FLAG_SPBAPI);
+    //FuncExit(TRACE_FLAG_SPBAPI);
 }
 
 BOOLEAN
@@ -789,7 +789,7 @@ OnInterruptIsr(
 
 --*/
 {
-    FuncEntry(TRACE_FLAG_SPBAPI);
+    //FuncEntry(TRACE_FLAG_SPBAPI);
 
     BOOLEAN fInterruptRecognized = TRUE;
     BOOLEAN fNotificationSent;
@@ -842,7 +842,7 @@ OnInterruptIsr(
             "Interrupt detected, but failed to send notification, ignoring");
     }
 
-    FuncExit(TRACE_FLAG_SPBAPI);
+    //FuncExit(TRACE_FLAG_SPBAPI);
 
     return fInterruptRecognized;
 }

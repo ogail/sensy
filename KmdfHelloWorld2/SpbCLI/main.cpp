@@ -56,76 +56,80 @@ OnControlKey(
     _In_ DWORD ControlType
     );
 
-VOID ExecuteCommand(string name, list<string> *params)
+int ExecuteCommand(string name, list<string> *params)
 {
-	CCommand* command = NULL;
-	string tag;
+    CCommand* command = NULL;
+    string tag;
+    int result = 0;
 
-	if (_stricmp(name.c_str(), "open") == 0)
-	{
-		command = new COpenCommand(params, tag);
-	}
-	else if (_stricmp(name.c_str(), "read") == 0)
-	{
-		command = new CReadCommand(params, tag);
-	}
-	else if (_stricmp(name.c_str(), "write") == 0)
-	{
-		command = new CWriteCommand(params, tag);
-	}
-	else if (_stricmp(name.c_str(), "close") == 0)
-	{
-		command = new CCloseCommand(params, tag);
-	}
-	else
-	{
-		assert(!"The sent cmd is not expected!");
-	}
+    if (_stricmp(name.c_str(), "open") == 0)
+    {
+        command = new COpenCommand(params, tag);
+    }
+    else if (_stricmp(name.c_str(), "read") == 0)
+    {
+        command = new CReadCommand(params, tag);
+    }
+    else if (_stricmp(name.c_str(), "write") == 0)
+    {
+        command = new CWriteCommand(params, tag);
+    }
+    else if (_stricmp(name.c_str(), "close") == 0)
+    {
+        command = new CCloseCommand(params, tag);
+    }
+    else
+    {
+        assert(!"The sent cmd is not expected!");
+    }
 
-	if (command->Parse())
-	{
-		g_CurrentCommand = command;
-		RunCommand(command);
-		g_CurrentCommand = nullptr;
+    if (command->Parse())
+    {
+        g_CurrentCommand = command;
+        RunCommand(command);
+        g_CurrentCommand = nullptr;
 
-		if (_stricmp(name.c_str(), "read") == 0)
-		{
-			BYTE MSB = ((CReadCommand*)command)->Buffer[0];
-			BYTE LSB = ((CReadCommand*)command)->Buffer[1];
-			int tmp = (((MSB << 8) | LSB) >> 4) * 0.0625;
-			printf("tmp is:%d\n", tmp);
-		}
-	}
-	else
-	{
-		command->DetachParameter(); //avoid double deletion
-	}
+        if (_stricmp(name.c_str(), "read") == 0)
+        {
+            BYTE MSB = ((CReadCommand*)command)->Buffer[0];
+            BYTE LSB = ((CReadCommand*)command)->Buffer[1];
+            result = (((MSB << 8) | LSB) >> 4) * 0.0625;
+            printf("tmp is:%d\n", result);
+        }
+    }
+    else
+    {
+        command->DetachParameter(); //avoid double deletion
+    }
 
-	delete command;
+    delete command;
+    return result;
 }
+
+I2CDisplay * screen = new I2CDisplay();
 
 VOID
 Sense()
 {
-	list<string> *params;
+    list<string> *params;
 
-	params = new list<string>{ "0x48" };
-	ExecuteCommand("open", params);
+    params = new list<string>{ "2" };
+    ExecuteCommand("open", params);
 
-	params = new list<string>{ "2" };
-	ExecuteCommand("read", params);
+    params = new list<string>{ "2" };
+    int tmp = ExecuteCommand("read", params);
 
-	params = new list<string>{ "0x48" };
-	ExecuteCommand("close", params);
+    params = new list<string>{};
+    ExecuteCommand("close", params);
 
-	params = new list<string>{ "0x27" };
-	ExecuteCommand("open", params);
-	
-	I2CDisplay screen;
-	screen.SetLine0("Hello world!");
+    params = new list<string>{ "1" };
+    ExecuteCommand("open", params);
+    
+    screen->SetLine0("Temperature is:");
+    screen->SetLine1(to_string(tmp));
 
-	params = new list<string>{ "0x27" };
-	ExecuteCommand("close", params);
+    params = new list<string>{};
+    ExecuteCommand("close", params);
 }
 
 void 
@@ -219,7 +223,7 @@ main(
 
     if (peripheralPath == nullptr)
     {
-		auto str = SPBTESTTOOL_USERMODE_PATH;
+        auto str = SPBTESTTOOL_USERMODE_PATH;
         g_Peripheral = CreateFileW(
             SPBTESTTOOL_USERMODE_PATH,
             (GENERIC_READ | GENERIC_WRITE),
@@ -248,7 +252,7 @@ main(
         goto exit;
     }
 
-	printf("Succeeded to obtain the handle\n");
+    printf("Succeeded to obtain the handle\n");
 
     setvbuf(inputStream, nullptr, _IONBF, 0);
     setvbuf(stdout, nullptr, _IONBF, 0);
@@ -320,35 +324,35 @@ main(
         {
             delete tokens;
             continue;
-		}
-		else if (_stricmp(tokens->front().c_str(), "magic") == 0)
-		{
-			Sense();
-		}
-		else
-		{
-			command = CCommand::_ParseCommand(tokens);
+        }
+        else if (_stricmp(tokens->front().c_str(), "magic") == 0)
+        {
+            Sense();
+        }
+        else
+        {
+            command = CCommand::_ParseCommand(tokens);
 
-			if (command == nullptr)
-			{
-				delete tokens;
-				continue;
-			}
+            if (command == nullptr)
+            {
+                delete tokens;
+                continue;
+            }
 
-			g_CurrentCommand = command;
+            g_CurrentCommand = command;
 
-			RunCommand(command);
+            RunCommand(command);
 
-			g_CurrentCommand = nullptr;
+            g_CurrentCommand = nullptr;
 
-			//
-			// A reference to the tokens list is saved by
-			// the command and will be freed when the command
-			// is deleted.
-			//
+            //
+            // A reference to the tokens list is saved by
+            // the command and will be freed when the command
+            // is deleted.
+            //
 
-			delete command;
-		}
+            delete command;
+        }
     }
     while (feof(inputStream) == 0);
 

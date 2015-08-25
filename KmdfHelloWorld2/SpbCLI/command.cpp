@@ -154,17 +154,19 @@ COpenCommand::Execute(
     //
 
     ULONG bytesReturned;
+    ULONG Buffer[1] = { Address };
+    DWORD BufferSize = sizeof(Buffer);
 
     if (File == nullptr)
     {
         return false;
     }
-    
+
     if ((DeviceIoControl(
         File, 
         IOCTL_SPBTESTTOOL_OPEN,
-        nullptr,
-        0,
+        Buffer,
+        BufferSize,
         nullptr,
         0,
         &bytesReturned,
@@ -189,7 +191,7 @@ COpenCommand::Complete(
     }
     else
     {
-        printf("Peripheral target opened\n");
+        printf("Peripheral %u target opened\n",  Address);
     }
 }
 

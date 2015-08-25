@@ -178,6 +178,7 @@ public:
 class COpenCommand : public CCommand
 {
 private:
+    ULONG  Address;
 
 public:
     COpenCommand(
@@ -198,6 +199,25 @@ public:
         _In_ DWORD        Status,
         _In_ DWORD        Information
         );
+
+    bool
+    Parse(
+        void
+        )
+    {
+        if (CCommand::Parse() == false)
+        {
+            return false;
+        }
+
+        if (PopNumberParameter(Parameters, 10, &Address) == false || Address <= 0)
+        {
+            printf("address required\n");
+            return false;
+        }
+
+        return true;
+    }
 };
 
 class CCloseCommand : public CCommand

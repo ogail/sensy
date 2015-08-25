@@ -29,7 +29,8 @@ EVT_WDF_REQUEST_CANCEL             SpbPeripheralOnWaitOnInterruptCancel;
 
 NTSTATUS
 SpbPeripheralOpen(
-    _In_  PDEVICE_CONTEXT  pDevice);
+    _In_  PDEVICE_CONTEXT  pDevice,
+    _In_  WDFREQUEST       FxRequest);
 
 NTSTATUS
 SpbPeripheralClose(
