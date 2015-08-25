@@ -23,4 +23,4 @@ devcon update Sensy.inf ACPI\Sensy
 Copy the src\ARM\Debug\SensyCLI.exe to the target machine and then execute this `magic` cmd
 
 # Wiring
-![alt text](https://github.com/ogail/sensy/raw/master/tools/wiring,jpg "Logo Title Text 1")
+![alt text](https://github.com/ogail/sensy/blob/master/tools/wiring.JPG "Wiring")
