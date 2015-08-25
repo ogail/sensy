@@ -9,7 +9,7 @@ Module Name:
 Abstract:
 
     This module contains the internal helper function definitions
-    for the SpbTestTool app.
+    for the Sensy app.
 
 Environment:
 

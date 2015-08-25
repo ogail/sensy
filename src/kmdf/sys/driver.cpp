@@ -296,7 +296,7 @@ OnDeviceAdd(
 
         status = RtlUnicodeStringPrintf(
             &symbolicLinkName, L"%ws",
-            SPBTESTTOOL_SYMBOLIC_NAME);
+            sensy_SYMBOLIC_NAME);
 
         if (!NT_SUCCESS(status))
         {

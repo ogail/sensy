@@ -502,7 +502,7 @@ OnTopLevelIoDefault(
 
     if ((params.Type == WdfRequestTypeDeviceControl) &&
         (params.Parameters.DeviceIoControl.IoControlCode == 
-            IOCTL_SPBTESTTOOL_WAIT_ON_INTERRUPT))
+            IOCTL_sensy_WAIT_ON_INTERRUPT))
     {
         SpbPeripheralWaitOnInterrupt(pDevice, FxRequest);
     }
@@ -695,41 +695,41 @@ Return Value:
 
     switch (IoControlCode)
     {
-    case IOCTL_SPBTESTTOOL_OPEN:
+    case IOCTL_sensy_OPEN:
         fSync = TRUE;
         status = SpbPeripheralOpen(pDevice, FxRequest);
         break;
 
-    case IOCTL_SPBTESTTOOL_CLOSE:
+    case IOCTL_sensy_CLOSE:
         fSync = TRUE;
         status = SpbPeripheralClose(pDevice);
         break;
 
-    case IOCTL_SPBTESTTOOL_LOCK:
+    case IOCTL_sensy_LOCK:
         SpbPeripheralLock(pDevice, FxRequest);
         break;
 
-    case IOCTL_SPBTESTTOOL_UNLOCK:
+    case IOCTL_sensy_UNLOCK:
         SpbPeripheralUnlock(pDevice, FxRequest);
         break;
 
-    case IOCTL_SPBTESTTOOL_LOCK_CONNECTION:
+    case IOCTL_sensy_LOCK_CONNECTION:
         SpbPeripheralLockConnection(pDevice, FxRequest);
         break;
 
-    case IOCTL_SPBTESTTOOL_UNLOCK_CONNECTION:
+    case IOCTL_sensy_UNLOCK_CONNECTION:
         SpbPeripheralUnlockConnection(pDevice, FxRequest);
         break;
 
-    case IOCTL_SPBTESTTOOL_WRITEREAD:
+    case IOCTL_sensy_WRITEREAD:
         SpbPeripheralWriteRead(pDevice, FxRequest);
         break;
 
-    case IOCTL_SPBTESTTOOL_FULL_DUPLEX:
+    case IOCTL_sensy_FULL_DUPLEX:
         SpbPeripheralFullDuplex(pDevice, FxRequest);
         break;
 
-    case IOCTL_SPBTESTTOOL_SIGNAL_INTERRUPT:
+    case IOCTL_sensy_SIGNAL_INTERRUPT:
         SpbPeripheralSignalInterrupt(pDevice, FxRequest);
         break;
         

@@ -33,7 +33,7 @@ extern "C"
 
 #define WPP_CONTROL_GUIDS                           \
     WPP_DEFINE_CONTROL_GUID(                        \
-        SpbTestToolTraceGuid,                       \
+        SensyTraceGuid,                       \
         (73e3b785,f5fb,423e,94a9,56627fea9053),     \
         WPP_DEFINE_BIT(TRACE_FLAG_WDFLOADING)       \
         WPP_DEFINE_BIT(TRACE_FLAG_SPBAPI)           \

@@ -1,7 +1,7 @@
 // Steps to update the SSDT:
 // 0a. Copy ASL.exe to your development board 
 // 0b. Open a command prompt as administrator and navigate to the directory where you have copied ASL.exe
-// 1. Compile spbtesttool.asl ("asl.exe spbtesttool.asl")
+// 1. Compile sensy.asl ("asl.exe sensy.asl")
 // 5. Copy the compiled file under Windows/System32 folder
 // 6. Restart your development board
 
@@ -11,7 +11,7 @@ DefinitionBlock ("ACPITABL.dat", "SSDT", 0x1, "Ogail", "SPBT", 0x1)
     {
         Device(SPBT)
         {
-            Name(_HID, "SpbTestTool")
+            Name(_HID, "Sensy")
             Name(_UID, 1)
             Method(_CRS, 0x0, NotSerialized)
             {

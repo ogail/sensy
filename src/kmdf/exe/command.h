@@ -9,7 +9,7 @@ Module Name:
 Abstract:
 
     This module contains the class declarations for the various
-    SpbTestTool commands.
+    Sensy commands.
 
 Environment:
 

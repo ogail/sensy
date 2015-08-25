@@ -9,7 +9,7 @@ Module Name:
 Abstract:
 
     This module contains the internal type definitations and
-    helper function declarations for the SpbTestTool app.
+    helper function declarations for the Sensy app.
 
 Environment:
 
@@ -40,7 +40,7 @@ Revision History:
 #include <winioctl.h>
 #include <specstrings.h>
 
-#include "spbtestioctl.h"
+#include "sensyioctl.h"
 
 using namespace std;
 

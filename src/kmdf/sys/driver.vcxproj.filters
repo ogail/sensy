@@ -42,10 +42,10 @@
     <ClInclude Include="peripheral.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="spbtestioctl.h">
+    <ClInclude Include="trace.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="trace.h">
+    <ClInclude Include="sensyioctl.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -55,11 +55,11 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <Inf Include="SpbTestTool.inx">
+    <Inf Include="Sensy.inx">
       <Filter>Driver Files</Filter>
     </Inf>
   </ItemGroup>
   <ItemGroup>
-    <None Include="spbtesttool.asl" />
+    <None Include="sensy.asl" />
   </ItemGroup>
 </Project>

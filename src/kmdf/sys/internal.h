@@ -40,7 +40,7 @@ Revision History:
 #include <ntstrsafe.h>
 
 #include "spb.h"
-#include "spbtestioctl.h"
+#include "sensyioctl.h"
 
 #define RESHUB_USE_HELPER_ROUTINES
 #include "reshub.h"

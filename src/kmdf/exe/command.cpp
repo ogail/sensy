@@ -9,7 +9,7 @@ Module Name:
 Abstract:
 
     This module contains the class definitions for the various
-    SpbTestTool commands.
+    Sensy commands.
 
 Environment:
 
@@ -48,7 +48,7 @@ PrintCommands()
     printf("  fullduplex {} <numBytes> simultaneously write byte array to peripheral\n");
     printf("                           and read <numBytes> back\n");
     printf("                            > full duplex {01 02 03} 5\n");
-    printf("  signal                   inform the SpbTestTool driver that the\n");
+    printf("  signal                   inform the Sensy driver that the\n");
     printf("                           interrupt has been handled\n");
     printf("  help                     print command list\n");
     printf("\n");
@@ -164,7 +164,7 @@ COpenCommand::Execute(
 
     if ((DeviceIoControl(
         File, 
-        IOCTL_SPBTESTTOOL_OPEN,
+        IOCTL_sensy_OPEN,
         Buffer,
         BufferSize,
         nullptr,
@@ -213,7 +213,7 @@ CCloseCommand::Execute(
     
     if ((DeviceIoControl(
         File, 
-        IOCTL_SPBTESTTOOL_CLOSE,
+        IOCTL_sensy_CLOSE,
         nullptr,
         0,
         nullptr,
@@ -262,7 +262,7 @@ CLockCommand::Execute(
     
     if ((DeviceIoControl(
         File, 
-        IOCTL_SPBTESTTOOL_LOCK,
+        IOCTL_sensy_LOCK,
         nullptr,
         0,
         nullptr,
@@ -311,7 +311,7 @@ CUnlockCommand::Execute(
     
     if ((DeviceIoControl(
         File, 
-        IOCTL_SPBTESTTOOL_UNLOCK,
+        IOCTL_sensy_UNLOCK,
         nullptr,
         0,
         nullptr,
@@ -360,7 +360,7 @@ CLockConnectionCommand::Execute(
     
     if ((DeviceIoControl(
         File, 
-        IOCTL_SPBTESTTOOL_LOCK_CONNECTION,
+        IOCTL_sensy_LOCK_CONNECTION,
         nullptr,
         0,
         nullptr,
@@ -409,7 +409,7 @@ CUnlockConnectionCommand::Execute(
     
     if ((DeviceIoControl(
         File, 
-        IOCTL_SPBTESTTOOL_UNLOCK_CONNECTION,
+        IOCTL_sensy_UNLOCK_CONNECTION,
         nullptr,
         0,
         nullptr,
@@ -537,7 +537,7 @@ CWriteReadCommand::Execute(
     }
 
     if ((DeviceIoControl(File, 
-                         IOCTL_SPBTESTTOOL_WRITEREAD,
+                         IOCTL_sensy_WRITEREAD,
                          WriteBuffer,
                          WriteLength,
                          Buffer,
@@ -582,7 +582,7 @@ CFullDuplexCommand::Execute(
     }
 
     if ((DeviceIoControl(File, 
-                         IOCTL_SPBTESTTOOL_FULL_DUPLEX,
+                         IOCTL_sensy_FULL_DUPLEX,
                          WriteBuffer,
                          WriteLength,
                          Buffer,
@@ -632,7 +632,7 @@ CSignalInterruptCommand::Execute(
     
     if ((DeviceIoControl(
         File, 
-        IOCTL_SPBTESTTOOL_SIGNAL_INTERRUPT,
+        IOCTL_sensy_SIGNAL_INTERRUPT,
         nullptr,
         0,
         nullptr,

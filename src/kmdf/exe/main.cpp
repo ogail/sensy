@@ -8,7 +8,7 @@ Module Name:
 
 Abstract:
 
-    This module contains the main entry point for the SpbTestTool
+    This module contains the main entry point for the Sensy
     app.  It facilitates accepting input, building commands, and
     printing output.
 
@@ -223,9 +223,9 @@ main(
 
     if (peripheralPath == nullptr)
     {
-        auto str = SPBTESTTOOL_USERMODE_PATH;
+        auto str = sensy_USERMODE_PATH;
         g_Peripheral = CreateFileW(
-            SPBTESTTOOL_USERMODE_PATH,
+            sensy_USERMODE_PATH,
             (GENERIC_READ | GENERIC_WRITE),
             0,
             nullptr,
@@ -401,7 +401,7 @@ DWORD WINAPI InterruptNotificationThread(
     {
         if ((DeviceIoControl(
             g_Peripheral, 
-            IOCTL_SPBTESTTOOL_WAIT_ON_INTERRUPT,
+            IOCTL_sensy_WAIT_ON_INTERRUPT,
             nullptr,
             0,
             nullptr,
@@ -429,7 +429,7 @@ DWORD WINAPI InterruptNotificationThread(
                 {
                     printf("\n\n");
                     printf("  **  Interrupt detected. Please acknowledge or disable   **\n");
-                    printf(" ***  and type 'signal' to inform the SpbTestTool driver  ***\n");
+                    printf(" ***  and type 'signal' to inform the Sensy driver  ***\n");
                     printf("  **  that the interrupt has been handled.                **\n");
                     printf("\n");
                 }
